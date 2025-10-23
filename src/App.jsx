@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom"
 
-import Admin from "./routes/admin";
-import Public from "./routes/public";
+import Admin from "./routes/Admin";
+import Public from "./routes/Public";
 
 
 const App = () => {
