@@ -1,52 +1,8 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 
-const universities = [
-    {
-        name: "University of Milan",
-        logo: "/assets/universities/logo/milan.png",
-        thumbnail: "/assets/universities/thumbnail/milan.jpg",
-        location: "Milan, Italy",
-        seats: {
-            eu: 44,
-            non_eu: 16,
-        },
-        tuitionFees: "€800 – €4,000 / year (income-based)",
-        programLength: "6 years (Medicine & Surgery)",
-        cta: "View Details",
-        ctaLink: "/blogs/university-of-milan",
-    },
-    {
-        name: "University of Pavia",
-        logo: "/assets/universities/logo/pavia.svg",
-        thumbnail: "/assets/universities/thumbnail/pavia.jpg",
-        location: "Pavia, Italy",
-        seats: {
-            eu: 70,
-            non_eu: 40,
-        },
-        tuitionFees: "€156 – €3,500 / year (income-based)",
-        programLength: "6 years (Medicine & Surgery)",
-        cta: "View Details",
-        ctaLink: "/blogs/university-of-pavia",
-    },
-    {
-        name: "University of Turin",
-        logo: "/assets/universities/logo/turin.svg",
-        thumbnail: "/assets/universities/thumbnail/turin.webp",
-        location: "Turin, Italy",
-        seats: {
-            eu: 70,
-            non_eu: 31,
-        },
-        tuitionFees: "€300 – €4,000 / year (income-based)",
-        programLength: "6 years (Medicine & Surgery)",
-        cta: "View Details",
-        ctaLink: "/blogs/university-of-turin",
-    },
-];
 
-const Universities = () => {
+const Universities = ({ title, universities }) => {
 
 
     const [search, setSearch] = useState('')
@@ -61,7 +17,7 @@ const Universities = () => {
 
     return (
         <div className='min-h-[50vh] py-4'>
-            <h2 className='text-3xl mt-8 mb-4 font-bold text-(--accent-dark) text-center'>Universities Accepting IMAT</h2>
+            <h2 className='text-3xl mt-8 mb-4 font-bold text-(--accent-dark) text-center'>{title}</h2>
             <div className='flex gap-4 flex-wrap items-center justify-end p-4 max-w-6xl mx-auto'>
                 <input type="text" placeholder='Search...' value={search} onChange={(e) => setSearch(e.target.value)} className='flex-4 p-2 border border-[var(--accent-dark)] rounded-md' />
                 <select name="category" value={location} onChange={(e) => setLocation(e.target.value)} className='p-2 border border-[var(--accent-dark)] rounded-md'>
@@ -75,6 +31,9 @@ const Universities = () => {
             </div>
 
             <div className='flex flex-col gap-8 p-4 max-w-7xl mx-auto'>
+                {filteredUniversities.length === 0 && (
+                    <p className='text-center text-(--accent-dark)'>No universities found.</p>
+                )}
                 {filteredUniversities.map((university, index) => (
                     <div key={index} className="flex flex-wrap rounded-md bg-(--accent-light) overflow-hidden">
                         <img src={university.thumbnail} alt={`${university.name} Campus`} className="flex-1 m-4 aspect-video rounded-xl min-w-[250px] w-full object-cover" />
@@ -93,8 +52,11 @@ const Universities = () => {
                                         <path d="M7.702 1.368a.75.75 0 0 1 .597 0c2.098.91 4.105 1.99 6.004 3.223a.75.75 0 0 1-.194 1.348A34.27 34.27 0 0 0 8.341 8.25a.75.75 0 0 1-.682 0c-.625-.32-1.262-.62-1.909-.901v-.542a36.878 36.878 0 0 1 2.568-1.33.75.75 0 0 0-.636-1.357 38.39 38.39 0 0 0-3.06 1.605.75.75 0 0 0-.372.648v.365c-.773-.294-1.56-.56-2.359-.8a.75.75 0 0 1-.194-1.347 40.901 40.901 0 0 1 6.005-3.223ZM4.25 8.348c-.53-.212-1.067-.411-1.611-.596a40.973 40.973 0 0 0-.418 2.97.75.75 0 0 0 .474.776c.175.068.35.138.524.21a5.544 5.544 0 0 1-.58.681.75.75 0 1 0 1.06 1.06c.35-.349.655-.726.915-1.124a29.282 29.282 0 0 0-1.395-.617A5.483 5.483 0 0 0 4.25 8.5v-.152Z" />
                                         <path d="M7.603 13.96c-.96-.6-1.958-1.147-2.989-1.635a6.981 6.981 0 0 0 1.12-3.341c.419.192.834.393 1.244.602a2.25 2.25 0 0 0 2.045 0 32.787 32.787 0 0 1 4.338-1.834c.175.978.315 1.969.419 2.97a.75.75 0 0 1-.474.776 29.385 29.385 0 0 0-4.909 2.461.75.75 0 0 1-.794 0Z" />
                                     </svg>
-                                    <span className='font-medium'>Seats Available: </span>
-                                    EU: {university.seats.eu}, Non-EU: {university.seats.non_eu}
+                                    {
+                                        university.seatsInfo.map((info, idx) => (
+                                            <span key={idx} className='font-medium'>{info.category} Seats: <span className='font-normal'>{info.seats}</span></span>
+                                        ))
+                                    }
                                 </p>
                                 <p className='space-x-2'>
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="size-4 inline">

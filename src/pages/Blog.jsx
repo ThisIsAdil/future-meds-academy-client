@@ -133,9 +133,9 @@ const Blog = () => {
         blog.content.tags && (
           <div className='px-4 pb-8 flex items-center flex-wrap gap-2'>
             <h2 className='text-lg font-semibold'>Tags:</h2>
-              {blog.content.tags.map((tag, index) => (
-                <span key={index} className='bg-(--accent-light) text-(--accent-dark) px-3 py-1 rounded-full text-sm'>{tag}</span>
-              ))}
+            {blog.content.tags.map((tag, index) => (
+              <span key={index} className='bg-(--accent-light) text-(--accent-dark) px-3 py-1 rounded-full text-sm'>{tag}</span>
+            ))}
           </div>
         )
       }

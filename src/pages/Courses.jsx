@@ -12,16 +12,6 @@ const courses = [
             "Access to previous papers & online simulators",
             "Career counseling sessions for admissions and future planning"
         ],
-        cta: [
-            {
-                path: "/consultation",
-                label: "Enroll Now"
-            },
-            {
-                path: "/courses/syllabus",
-                label: "View Syllabus"
-            }
-        ]
     },
     {
         _id: "665f1a1e1c9d440001a1a002",
@@ -34,16 +24,6 @@ const courses = [
             "Bi-weekly mock tests with ranking",
             "Personalized guidance & career counseling"
         ],
-        cta: [
-            {
-                path: "/consultation",
-                label: "Enroll Now"
-            },
-            {
-                path: "/courses/syllabus",
-                label: "View Syllabus"
-            }
-        ]
     },
     {
         _id: "665f1a1e1c9d440001a1a003",
@@ -56,16 +36,6 @@ const courses = [
             "Mentorship from students studying in Italy",
             "Notes, important questions & emotional/financial support"
         ],
-        cta: [
-            {
-                path: "/consultation",
-                label: "Enroll Now"
-            },
-            {
-                path: "/courses/syllabus",
-                label: "View Syllabus"
-            }
-        ]
     },
     {
         _id: "665f1a1e1c9d440001a1a004",
@@ -77,16 +47,6 @@ const courses = [
             "Strategic shortcuts & problem-solving methods",
             "High-yield syllabus coverage"
         ],
-        cta: [
-            {
-                path: "/consultation",
-                label: "Enroll Now"
-            },
-            {
-                path: "/courses/syllabus",
-                label: "View Syllabus"
-            }
-        ]
     },
     {
         _id: "665f1a1e1c9d440001a1a005",
@@ -98,16 +58,6 @@ const courses = [
             "Simplified diagrams & quick revision methods",
             "Interactive live + recorded sessions"
         ],
-        cta: [
-            {
-                path: "/consultation",
-                label: "Enroll Now"
-            },
-            {
-                path: "/courses/syllabus",
-                label: "View Syllabus"
-            }
-        ]
     },
     {
         _id: "665f1a1e1c9d440001a1a006",
@@ -120,16 +70,6 @@ const courses = [
             "Interactive & engaging teaching",
             "Recorded lectures for revision"
         ],
-        cta: [
-            {
-                path: "/consultation",
-                label: "Enroll Now"
-            },
-            {
-                path: "/courses/syllabus",
-                label: "View Syllabus"
-            }
-        ]
     },
     {
         _id: "665f1a1e1c9d440001a1a007",
@@ -142,16 +82,6 @@ const courses = [
             "Strategy-based learning with shortcuts",
             "Live + recorded lessons"
         ],
-        cta: [
-            {
-                path: "/consultation",
-                label: "Enroll Now"
-            },
-            {
-                path: "/courses/syllabus",
-                label: "View Syllabus"
-            }
-        ]
     },
     {
         _id: "665f1a1e1c9d440001a1a008",
@@ -164,16 +94,6 @@ const courses = [
             "Step-by-step problem-solving methods",
             "Interactive practice & mock tests"
         ],
-        cta: [
-            {
-                path: "/consultation",
-                label: "Enroll Now"
-            },
-            {
-                path: "/courses/syllabus",
-                label: "View Syllabus"
-            }
-        ]
     },
     {
         _id: "665f1a1e1c9d440001a1a009",
@@ -185,16 +105,6 @@ const courses = [
             "Updated study resources & notes",
             "Guidance tailored for study-abroad applicants"
         ],
-        cta: [
-            {
-                path: "/consultation",
-                label: "Enroll Now"
-            },
-            {
-                path: "/courses/syllabus",
-                label: "View Syllabus"
-            }
-        ]
     }
 ]
 
@@ -209,21 +119,13 @@ const Courses = () => {
 
     return (
         <div className='max-w-7xl mx-auto my-8'>
-            {/* <div className='bg-(--accent-light) text-center max-w-7xl mx-auto my-8 p-8 space-y-4'>
-                <h1 className='text-3xl font-bold text-(--accent-dark) max-w-xl mx-auto'>Discover IMAT & Study Abroad Courses with Future MedsAcademy</h1>
-                <p className='max-w-3xl mx-auto'>From IMAT preparation to IELTS training, our expert-led courses are designed to help you crack exams, build confidence, and secure admission to top universities abroad. Learn with live lectures, mock tests, and personalized mentorship that make all the difference.</p>
-            </div> */}
             <div className='flex gap-4 flex-wrap items-center justify-end p-4'>
                 <input type="text" placeholder='Search Courses...' value={search} onChange={(e) => setSearch(e.target.value)} className='flex-4 p-2 border border-[var(--accent-dark)] rounded-md' />
-                {/* <select name="category" value={category} onChange={(e) => setCategory(e.target.value)} className='p-2 border border-[var(--accent-dark)] rounded-md'>
-                    <option value="">All Categories</option>
-                    <option value="IMAT">IMAT</option>
-                    <option value="IELTS">IELTS</option>
-                    <option value="Medical">Medical</option>
-                </select> */}
-                <button className='animated-button'>
-                    <Link to="/consultation" className='label'>Talk to a Mentor</Link>
-                </button>
+                <Link to="/consultation" className='animated-button'>
+                    <button className='label'>
+                        Talk to a Mentor
+                    </button>
+                </Link>
             </div>
             <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8 bg-(--accent-light) p-4 w-full rounded-md'>
                 {filteredCourses.map((course, index) => (
@@ -233,25 +135,22 @@ const Courses = () => {
                         <div className='flex flex-col gap-4 justify-between flex-1'>
                             <p>{course.description}</p>
                             <h3 className='font-semibold'>Why Choose This Course?</h3>
-                            <ul className='list-disc mx-6'>
+                            <ul className=''>
                                 {course.why_choose.map((point, idx) => (
-                                    <li key={idx}>{point}</li>
+                                    <li key={idx}><span className='text-green-500 mr-2 mt-0.5'>✓</span> {point}</li>
                                 ))}
                             </ul>
-                            <div className='flex items-center'>
-                                {course.cta && course.cta.length > 0 && (
-                                    course.cta.map((cta, ctaIdx) => (
-                                        <button key={ctaIdx} className='animated-button mr-2'>
-                                            {cta.path.startsWith('http') ? (
-                                                <a href={cta.path} target="_blank" rel="noopener noreferrer" className='label'>{cta.label}</a>
-                                            ) : cta.path.toLowerCase().includes('syllabus') ? (
-                                                <Link to={cta.path + '/' + course._id} className='label'>{cta.label}</Link>
-                                            ) : (
-                                                <Link to={cta.path} className='label'>{cta.label}</Link>
-                                            )}
-                                        </button>
-                                    ))
-                                )}
+                            <div className='grid grid-cols-1 md:grid-cols-2 gap-4 mt-4'>
+                                <Link to={`/courses/syllabus/${course._id}`}>
+                                    <button className='animated-button w-full'>
+                                        <span className='label'>View Course Details</span>
+                                    </button>
+                                </Link>
+                                <a href={`https://wa.me/${import.meta.env.VITE_WHATSAPP_NUMBER}?text=${encodeURIComponent(`Hello, I want to enroll in ${course.title} now!`)}`} target="_blank" rel="noopener noreferrer">
+                                    <button className='animated-button w-full'>
+                                        <span className='label'>Enroll Now via WhatsApp</span>
+                                    </button>
+                                </a>
                             </div>
                         </div>
                     </div>

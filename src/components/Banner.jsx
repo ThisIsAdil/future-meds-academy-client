@@ -4,13 +4,22 @@ import { Link } from 'react-router-dom'
 const Banner = ({ content }) => {
     const { title, description, buttonText, buttonLink } = content;
     return (
-        <div className='mb-8 px-[5vw] py-16 text-center rounded-lg flex flex-col justify-center items-center gap-8 bg-(--accent-dark) text-(--primary)'>
-            <h1 className='text-2xl md:text-4xl font-bold'>{title}</h1>
-            <p>{description}</p>
-            <button className="bg-(--accent-light) text-(--accent-dark) p-4">
-                <Link to={buttonLink} className="animated-link">{buttonText}</Link>
-            </button>
-        </div>
+        <section className='py-16 px-6 bg-(--accent-dark) rounded-lg mb-16'>
+            <div className='max-w-4xl mx-auto text-center'>
+                <h1 className='text-2xl md:text-3xl text-(--primary) font-medium mb-4 tracking-tight'>
+                    {title}
+                </h1>
+                <p className='text-(--accent-light) font-light mb-8 max-w-2xl mx-auto'>
+                    {description}
+                </p>
+                <Link
+                    to={buttonLink}
+                    className='inline-block bg-(--primary) text-(--accent-dark) font-medium py-3 px-6'
+                >
+                    {buttonText}
+                </Link>
+            </div>
+        </section>
     )
 }
 

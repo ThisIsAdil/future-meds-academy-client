@@ -83,11 +83,26 @@ body {
   position: relative;
   z-index: 1;
   transition: color 500ms ease;
-  white-space: nowrap;
+  /* white-space: nowrap; */
 }
 
 .animated-button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
   filter: grayscale(.15);
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease-in;
+  white-space: nowrap;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }

@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 
@@ -15,40 +14,40 @@ const HeroSection = () => {
     useEffect(() => {
         const interval = setInterval(() => {
             setCurrentImageIndex((prevIndex) => (prevIndex + 1) % featuredGallery.length)
-        }, 2000)
+        }, 3000)
 
-        return () => clearInterval(interval) // Cleanup on unmount
+        return () => clearInterval(interval)
     }, [featuredGallery.length])
 
     return (
-        <div className='flex flex-col items-center gap-8 flex-wrap-reverse bg-(--accent-light) rounded-md p-8 md:m-8 sm:flex-row'>
-            <div className="flex-1 aspect-video w-full relative overflow-hidden">
+        <div className='flex flex-col items-center gap-8 flex-wrap-reverse bg-(--accent-light) md:my-8 rounded-md p-12  sm:flex-row'>
+            <div className="flex-1 aspect-square lg:aspect-video w-full relative overflow-hidden">
                 {
                     featuredGallery.map((image, index) => (
                         <img
                             key={index}
                             src={image}
-                            alt={`Featured ${index + 1}`}
-                            className={`w-full h-full object-cover rounded-md transition-opacity duration-1000 ${index === currentImageIndex ? 'opacity-100' : 'opacity-0 absolute top-0 left-0'
+                            alt={`IMAT preparation ${index + 1}`}
+                            className={`w-full h-full object-cover rounded-md transition-opacity duration-1500 ${index === currentImageIndex ? 'opacity-100' : 'opacity-0 absolute top-0 left-0'
                                 }`}
                         />
                     ))
                 }
             </div>
-            <div className="flex flex-col gap-4 flex-1 text-center sm:text-left">
-                <h1 className="text-2xl text-(--accent-dark) font-bold md:text-3xl">Prepare for IMAT <br /> with Expert Guidance</h1>
-                <p className="">Crack the IMAT exam with step-by-step support for admissions abroad.</p>
-                <div className="flex justify-center gap-2 flex-wrap sm:justify-start">
-                    <button className="animated-button">
-                        <Link to="/">
-                            <span className="label text-sm">Access IMAT PYQs</span>
-                        </Link>
-                    </button>
-                    <button className="animated-button">
-                        <Link to="/courses">
-                            <span className="label text-sm lg:text-base">Explore Courses</span>
-                        </Link>
-                    </button>
+            <div className="flex flex-col gap-2 flex-1 text-center sm:text-left">
+                <h1 className="text-3xl text-(--accent-dark) font-semibold leading-tight lg:text-4xl">Excel in IMAT with Professional Guidance</h1>
+                <p className="text-lg leading-relaxed opacity-90">Comprehensive preparation and expert support for international medical admissions.</p>
+                <div className="flex justify-center gap-2 flex-wrap sm:justify-start mt-4">
+                    <Link to="/previous-year-papers">
+                        <button className="animated-button">
+                            <span className="label">View Past Papers</span>
+                        </button>
+                    </Link>
+                    <Link to="/courses">
+                        <button className="animated-button">
+                            <span className="label">Browse Courses</span>
+                        </button>
+                    </Link>
                 </div>
             </div>
         </div>

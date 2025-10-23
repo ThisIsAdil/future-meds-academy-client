@@ -78,9 +78,11 @@ const CourseSyllabus = () => {
                         <h1 className='text-xl font-semibold'>{course.title} (€{course.price}) – {course.duration}</h1>
                         <p>{course.shortDescription}</p>
                     </div>
-                    <Link to={`/courses/syllabus/${course.id}`} className='animated-button'>
-                        <button className='label'>Enroll Now</button>
-                    </Link>
+                    <a href={`https://wa.me/${import.meta.env.VITE_WHATSAPP_NUMBER}?text=${encodeURIComponent(`Hello, I want to enroll in ${course.title} now!`)}`} target="_blank" rel="noopener noreferrer">
+                        <button className='animated-button w-full'>
+                            <span className='label'>Enroll Now via WhatsApp</span>
+                        </button>
+                    </a>
                 </div>
             </div>
             <div className='max-w-3xl mx-auto p-4'>
@@ -107,13 +109,13 @@ const CourseSyllabus = () => {
                 <h2 className='text-lg font-semibold mb-1'>Instructor</h2>
                 <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8'>
                     {course.instructor.map((inst, index) => (
-                        <div key={index} className='flex flex-col flex-wrap text-center gap-4 mb-4 items-center bg-(--accent-light) p-4 rounded-md'>
+                        <Link to={`/team/${inst.name.replace(/\s+/g, '-').toLowerCase()}`} key={index} className='flex flex-col flex-wrap text-center gap-4 mb-4 items-center bg-(--accent-light) p-4 rounded-md'>
                             <img src={inst.photoUrl} alt={inst.name} className='w-24 h-24 object-cover rounded-full' />
                             <div>
                                 <h3 className='text-md font-semibold'>{inst.name}</h3>
                                 <p className='italic text-xs'>{inst.title}</p>
                             </div>
-                        </div>
+                        </Link>
                     ))}
                 </div>
             </div>
@@ -124,9 +126,11 @@ const CourseSyllabus = () => {
                     <li>Access to all course materials and resources for {course.duration}</li>
                     <li>Certificate of completion upon finishing the course</li>
                 </ul>
-                <Link to={`/courses/enroll/${course.id}`} className='animated-button'>
-                    <button className='label'>Enroll Now</button>
-                </Link>
+                <a href={`https://wa.me/${import.meta.env.VITE_WHATSAPP_NUMBER}?text=${encodeURIComponent(`Hello, I want to enroll in ${course.title} now!`)}`} target="_blank" rel="noopener noreferrer">
+                    <button className='animated-button w-full'>
+                        <span className='label'>Enroll Now via WhatsApp</span>
+                    </button>
+                </a>
             </div>
 
             <FAQ faq={FAQContent} whichFaq={course.title} />

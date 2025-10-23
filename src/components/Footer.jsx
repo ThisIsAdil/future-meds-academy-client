@@ -4,7 +4,7 @@ const Footer = () => {
     {
       title: "Future MedsAcademy", links: [
         { name: "Home", path: "/" },
-        {name: "About Us", path: "/about" },
+        { name: "About Us", path: "/about" },
         { name: "Courses", path: "/courses" },
         { name: "Blog", path: "/blog" },
       ]
@@ -12,7 +12,7 @@ const Footer = () => {
     {
       title: "Resources", links: [
         { name: "IMAT", path: "/imat" },
-        { name: "IMAT PYQs", path: "/imat-pyq" },
+        { name: "Previous Year Papers", path: "/previous-year-papers" },
         { name: "Universities", path: "/universities" },
         { name: "Study Abroad", path: "/study-abroad" },
       ]
@@ -27,7 +27,7 @@ const Footer = () => {
   ]
 
   return (
-    <footer className='bg-(--accent-light)'>
+    <footer className='footer bg-(--accent-light)'>
       <div className='flex flex-wrap px-8 py-12 max-w-7xl mx-auto gap-8'>
         <div className='flex-1 flex flex-wrap min-w-[250px] gap-8'>
           {
@@ -51,7 +51,7 @@ const Footer = () => {
         </div>
         <div className='flex-1 min-w-[250px]'>
           <h4 className='text-(--accent-dark) font-bold text-lg mb-2'>Subscribe</h4>
-          <p className='text-sm'>Join our newsletter to stay up to date on features and releases.</p>
+          <p className='text-sm'>Stay informed about our newest courses and features — subscribe today!</p>
           <form onSubmit={(e) => e.preventDefault()} className='flex flex-row items-center flex-wrap max-w-lg gap-1 my-4'>
             <input type="email" required placeholder="Enter your email" className='w-full max-w-xs my-2 p-2 border border-[--accent-dark]' />
             <button type="submit" className="animated-button">

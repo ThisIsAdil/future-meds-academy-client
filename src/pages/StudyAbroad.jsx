@@ -3,46 +3,46 @@ import { Link } from 'react-router-dom'
 import { FAQ } from '../components';
 
 const StudyAbroadFAQ = [
-  {
-    question: "Why should I consider studying medicine abroad?",
-    answer:
-      "Studying medicine abroad gives you access to world-class universities, internationally recognized degrees, affordable tuition, and the chance to experience different cultures. It also increases career opportunities by expanding your global network."
-  },
-  {
-    question: "Which countries can I apply to through Future MedsAcademy?",
-    answer:
-      "We currently support admissions to several European countries, including Italy, Lithuania, and others. Each destination has unique advantages, such as language of instruction, eligibility criteria, and cost structure."
-  },
-  {
-    question: "What are the basic eligibility requirements?",
-    answer:
-      "Most countries require a completed high school diploma with strong grades in science subjects. Some may also require entrance exams (such as IMAT in Italy), proof of English proficiency (IELTS/TOEFL), and visa documentation."
-  },
-  {
-    question: "Do I need IELTS or TOEFL to apply?",
-    answer:
-      "It depends on the university and country. Many programs in Europe offer English-taught courses and may require IELTS or TOEFL scores. However, some institutions accept alternative proof of English proficiency, such as previous schooling in English."
-  },
-  {
-    question: "How much does it cost to study medicine abroad?",
-    answer:
-      "Tuition fees and living costs vary by country. For example, in Italy, tuition fees can be significantly lower than in many other countries, while in Lithuania, costs are moderate with flexible payment options. We provide detailed breakdowns during the consultation process."
-  },
-  {
-    question: "What support does Future MedsAcademy provide?",
-    answer:
-      "We guide you through every step: eligibility checks, application submission, exam preparation, visa assistance, scholarships, accommodation, and settling abroad. We also provide language training through our partner, Blooms Academy."
-  },
-  {
-    question: "Can I work while studying abroad?",
-    answer:
-      "Yes, many countries allow international students to work part-time during their studies. The number of hours permitted depends on local regulations. We provide guidance on balancing study and work opportunities."
-  },
-  {
-    question: "How do I start the application process?",
-    answer:
-      "The first step is to book a consultation with our team. We’ll review your academic background, help you choose the best destination, and provide a step-by-step roadmap for your application journey."
-  }
+    {
+        question: "Why should I consider studying medicine abroad?",
+        answer:
+            "Studying medicine abroad gives you access to world-class universities, internationally recognized degrees, affordable tuition, and the chance to experience different cultures. It also increases career opportunities by expanding your global network."
+    },
+    {
+        question: "Which countries can I apply to through Future MedsAcademy?",
+        answer:
+            "We currently support admissions to several European countries, including Italy, Lithuania, and others. Each destination has unique advantages, such as language of instruction, eligibility criteria, and cost structure."
+    },
+    {
+        question: "What are the basic eligibility requirements?",
+        answer:
+            "Most countries require a completed high school diploma with strong grades in science subjects. Some may also require entrance exams (such as IMAT in Italy), proof of English proficiency (IELTS/TOEFL), and visa documentation."
+    },
+    {
+        question: "Do I need IELTS or TOEFL to apply?",
+        answer:
+            "It depends on the university and country. Many programs in Europe offer English-taught courses and may require IELTS or TOEFL scores. However, some institutions accept alternative proof of English proficiency, such as previous schooling in English."
+    },
+    {
+        question: "How much does it cost to study medicine abroad?",
+        answer:
+            "Tuition fees and living costs vary by country. For example, in Italy, tuition fees can be significantly lower than in many other countries, while in Lithuania, costs are moderate with flexible payment options. We provide detailed breakdowns during the consultation process."
+    },
+    {
+        question: "What support does Future MedsAcademy provide?",
+        answer:
+            "We guide you through every step: eligibility checks, application submission, exam preparation, visa assistance, scholarships, accommodation, and settling abroad. We also provide language training through our partner, Blooms Academy."
+    },
+    {
+        question: "Can I work while studying abroad?",
+        answer:
+            "Yes, many countries allow international students to work part-time during their studies. The number of hours permitted depends on local regulations. We provide guidance on balancing study and work opportunities."
+    },
+    {
+        question: "How do I start the application process?",
+        answer:
+            "The first step is to book a consultation with our team. We’ll review your academic background, help you choose the best destination, and provide a step-by-step roadmap for your application journey."
+    }
 ];
 
 
@@ -98,13 +98,13 @@ const StudyAbroad = () => {
                     Your journey to becoming a doctor starts here. From understanding eligibility and preparing for entrance exams, to securing visas and settling in a new country, we provide step-by-step guidance to make studying medicine abroad simple, clear, and stress-free.
                 </p>
                 <div className='flex justify-center flex-wrap gap-4 my-8'>
-                    <Link to="/universities" className='animated-button'><span className='label'>Explore Universities</span></Link>
-                    <Link to="/consultation" className='animated-button'><span className='label'>Contact a Consultant</span></Link>
+                    <Link to="/study-abroad/universities" className='animated-button'><span className='label'>Explore Universities</span></Link>
+                    <a target='_blank' href="https://bloomsacademy.com" className='animated-button'><span className='label'>Explore Blooms Academy</span></a>
                 </div>
             </div>
-            <div className='flex gap-8 w-screen justify-center mx-auto'>
-                <div className='max-w-4xl'>
-                    <div id='why-study-medicine-abroad' className='p-8 space-y-2'>
+            <div className='grid grid-cols-1 md:grid-cols-3 p-4 gap-8 justify-center mx-auto'>
+                <div className='max-w-4xl md:col-span-2 space-y-8 px-4'>
+                    <div id='why-study-medicine-abroad' className='space-y-2'>
                         <h1 className='text-2xl font-bold text-(--accent-dark)'>Why Choose to Study Medicine Abroad?</h1>
                         <p className='text-justify'>Studying medicine abroad offers unparalleled opportunities to gain a high-quality education, international exposure, and globally recognized qualifications. By choosing the right destination, students can access world-class universities, diverse learning environments, and cost-effective programs while preparing for a successful medical career.</p>
                         <ul className='space-y-2 p-2'>
@@ -150,7 +150,7 @@ const StudyAbroad = () => {
                             </li>
                         </ul>
                     </div>
-                    <div id='our-destination-countries' className='p-8 space-y-2'>
+                    <div id='our-destination-countries' className='space-y-2'>
                         <h1 className='text-2xl font-bold text-(--accent-dark)'>Our Destination Countries</h1>
                         <p>
                             We guide aspiring medical students to study in some of the world’s most sought-after destinations. Each country offers unique opportunities, including language options, recognized universities, and tailored admission pathways. Our goal is to help you choose the right destination that aligns with your academic and career goals.
@@ -204,12 +204,12 @@ const StudyAbroad = () => {
                         </div>
                     </div>
                 </div>
-                <ul className='bg-(--accent-light) w-fit hidden md:block rounded-lg p-8 sticky top-24 h-fit self-start'>
+                <ul className='bg-(--accent-light) w-full hidden md:block rounded-lg p-8 sticky top-24 h-fit self-start'>
                     <h4 className='mb-4'>On This Page</h4>
-                    <li className='mb-2 whitespace-nowrap'><a href="#why-study-medicine-abroad" className='animated-link'>Why Choose to Study Medicine Abroad?</a></li>
-                    <li className='mb-2 whitespace-nowrap'><a href="#our-destination-countries" className='animated-link'>Our Destination Countries</a></li>
-                    <li className='mb-2 whitespace-nowrap'><a href="#what-you-need-to-apply" className='animated-link'>What You Need to Apply</a></li>
-                    <li className='mb-2 whitespace-nowrap'><a href="#helpful-resources" className='animated-link'>Helpful Resources for Your Journey</a></li>
+                    <li className='mb-2'><a href="#why-study-medicine-abroad" className='animated-link'>Why Choose to Study Medicine Abroad?</a></li>
+                    <li className='mb-2'><a href="#our-destination-countries" className='animated-link'>Our Destination Countries</a></li>
+                    <li className='mb-2'><a href="#what-you-need-to-apply" className='animated-link'>What You Need to Apply</a></li>
+                    <li className='mb-2'><a href="#helpful-resources" className='animated-link'>Helpful Resources for Your Journey</a></li>
                 </ul>
             </div>
             <FAQ faq={StudyAbroadFAQ} whichFaq={"Study Abroad"} />

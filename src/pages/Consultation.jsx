@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
-export default function ConsultationForm() {
+export default function Consultation() {
     const [submitted, setSubmitted] = useState(false);
 
     const handleSubmit = (e) => {
@@ -14,9 +14,9 @@ export default function ConsultationForm() {
         <div className="min-h-[80vh] flex items-center justify-center px-4 py-16">
 
             {!submitted ? (
-                <div className="max-w-md w-full bg-white p-8 rounded-xl shadow-xl">
+                <div className="max-w-md w-full bg-white border border-gray-100 p-8 rounded-xl shadow-xl">
                     <h1 className="text-2xl font-bold text-center mb-2 text-(--accent-dark)">Book Your Free Consultation</h1>
-                    <p className="text-center text-gray-300 mb-6">
+                    <p className="text-center text-gray-400 mb-6">
                         Fill in the form below and our team will reach out shortly.
                     </p>
                     <form onSubmit={handleSubmit} className="flex flex-col gap-4 items-center">

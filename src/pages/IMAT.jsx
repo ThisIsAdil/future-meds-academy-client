@@ -111,68 +111,6 @@ const IMAT = () => {
         }
     ]
 
-    const IMATCutOffs = [
-        {
-            "year": 2023,
-            "universities": [
-                {
-                    "name": "University of Milan",
-                    "eu_cutoff": 52.4,
-                    "non_eu_cutoff": 38.2
-                },
-                {
-                    "name": "University of Pavia",
-                    "eu_cutoff": 48.7,
-                    "non_eu_cutoff": 36.1
-                },
-                {
-                    "name": "University of Turin",
-                    "eu_cutoff": 45.2,
-                    "non_eu_cutoff": 34.5
-                }
-            ]
-        },
-        {
-            "year": 2022,
-            "universities": [
-                {
-                    "name": "University of Milan",
-                    "eu_cutoff": 50.8,
-                    "non_eu_cutoff": 37.0
-                },
-                {
-                    "name": "University of Pavia",
-                    "eu_cutoff": 47.3,
-                    "non_eu_cutoff": 35.4
-                },
-                {
-                    "name": "University of Turin",
-                    "eu_cutoff": 44.6,
-                    "non_eu_cutoff": 33.9
-                }
-            ]
-        },
-        {
-            "year": 2021,
-            "universities": [
-                {
-                    "name": "University of Milan",
-                    "eu_cutoff": 49.1,
-                    "non_eu_cutoff": 34.2
-                },
-                {
-                    "name": "University of Pavia",
-                    "eu_cutoff": 46.5,
-                    "non_eu_cutoff": 33.8
-                },
-                {
-                    "name": "University of Turin",
-                    "eu_cutoff": 43.7,
-                    "non_eu_cutoff": 32.5
-                }
-            ]
-        }
-    ]
 
 
 
@@ -188,7 +126,7 @@ const IMAT = () => {
             </div>
             <div className='flex justify-center gap-8 w-full mx-auto'>
                 <div className='max-w-4xl w-full'>
-                    <div id='what-is-imat' className='max-w-6xl flex flex-col justify-center gap-4 bg-(--accent-light) rounded-lg px-8 py-16 w-full'>
+                    <div id='what-is-imat' className='max-w-6xl flex flex-col justify-center gap-4 bg-(--accent-light) rounded-lg px-8 py-16'>
                         <h1 className='text-3xl font-bold text-(--accent-dark) mx-auto max-w-5xl w-full'>What is IMAT Examination?</h1>
                         <p className='max-w-5xl mx-auto'>The IMAT (International Medical Admissions Test) is a standardized entrance exam for students who want to study medicine and surgery in English at Italian universities. It is required by many public universities in Italy and is used to assess skills in logical reasoning, problem-solving, general knowledge, and core science subjects like biology, chemistry, physics, and mathematics.</p>
                         <p className='max-w-5xl mx-auto'>The test is created by the Italian Ministry of Education in collaboration with Cambridge Assessment and is held once a year, typically in September.</p>
@@ -268,31 +206,19 @@ const IMAT = () => {
                     </div>
                     <div id='cutoff-scores' className='py-8 px-4'>
                         <h2 className='text-3xl font-bold text-(--accent-dark)'>IMAT Cutoff Scores (EU & Non-EU Students)</h2>
-                        <p>Check the past 3–4 years of cutoff scores for Italian medical universities. Use this data to understand trends and plan your IMAT preparation strategically.</p>
-                        <div className='overflow-x-auto grid my-4'>
-                            {IMATCutOffs.map((yearData, index) => (
-                                <table key={index} className='min-w-[300px] md:min-w-full border-collapse mb-4'>
-                                    <thead>
-                                        <tr>
-                                            <th className='border border-gray-300 p-2 bg-(--accent-light)'>Year</th>
-                                            <th className='border border-gray-300 p-2 bg-(--accent-light)'>University</th>
-                                            <th className='border border-gray-300 p-2 bg-(--accent-light)'>EU Cutoff</th>
-                                            <th className='border border-gray-300 p-2 bg-(--accent-light)'>Non-EU Cutoff</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {yearData.universities.map((uni, uniIndex) => (
-                                            <tr key={uniIndex} className='text-center'>
-                                                <td className='border border-gray-300 p-2'>{yearData.year}</td>
-                                                <td className='border border-gray-300 p-2'>{uni.name}</td>
-                                                <td className='border border-gray-300 p-2'>{uni.eu_cutoff}</td>
-                                                <td className='border border-gray-300 p-2'>{uni.non_eu_cutoff}</td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            ))}
-                        </div>
+                        <p>Check official IMAT cutoff trends from the past years for Italian medical universities. Analyze score patterns and plan your preparation strategically.</p>
+                        <ul className="flex flex-col sm:flex-row gap-4 mt-4">
+                            <li className="mt-4">
+                                <Link to="/imat/cutoff/eu">
+                                    <button className="animated-button"><span className="label">EU Cutoff Scores</span></button>
+                                </Link>
+                            </li>
+                            <li className="mt-4">
+                                <Link to="/imat/cutoff/non-eu">
+                                    <button className="animated-button"><span className="label">Non-EU Cutoff Scores</span></button>
+                                </Link>
+                            </li>
+                        </ul>
                     </div>
                 </div>
                 <ul className='bg-(--accent-light) w-fit hidden md:block rounded-lg p-8 sticky top-24 h-fit self-start'>
