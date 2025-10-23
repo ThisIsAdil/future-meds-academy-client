@@ -1,72 +1,28 @@
 import React, { useEffect, useRef } from 'react'
+import testimonials from '../../data/testimonials'
 
 const Testimonial = () => {
-    const testimonials = [
-        {
-            name: "Sara Khan",
-            date: "October 2024",
-            testimonial: "Future MedsAcademy made my IMAT journey so much easier. The mock tests and mentorship gave me confidence, and I felt fully prepared on exam day.",
-            score: 54,
-            stars: 5
-        },
-        {
-            name: "Luca Bianchi",
-            date: "September 2024",
-            testimonial: "The structured lectures and guidance on visa and admissions were priceless. I wouldn't have secured a spot in Italy without their support.",
-            score: 50,
-            stars: 4
-        },
-        {
-            name: "Ayesha Ahmed",
-            date: "November 2024",
-            testimonial: "I especially loved the bi-weekly mock tests with rankings — they pushed me to improve each time. The tutors explained everything so clearly.",
-            score: 56,
-            stars: 5
-        },
-        {
-            name: "Sara Khan",
-            date: "October 2024",
-            testimonial: "Future MedsAcademy made my IMAT journey so much easier. The mock tests and mentorship gave me confidence, and I felt fully prepared on exam day.",
-            score: 54,
-            stars: 3
-        },
-        {
-            name: "Luca Bianchi",
-            date: "September 2024",
-            testimonial: "The structured lectures and guidance on visa and admissions were priceless. I wouldn't have secured a spot in Italy without their support.",
-            score: 50,
-            stars: 4
-        },
-        {
-            name: "Ayesha Ahmed",
-            date: "November 2024",
-            testimonial: "I especially loved the bi-weekly mock tests with rankings — they pushed me to improve each time. The tutors explained everything so clearly.",
-            score: 56,
-            stars: 1
-        },
-    ];
-
-    const containerRef = useRef(null);
-    const intervalRef = useRef(null);
+    const containerRef = useRef(null)
+    const intervalRef = useRef(null)
 
     const startAutoScroll = () => {
-        const container = containerRef.current;
-        if (!container) return;
+        const container = containerRef.current
+        if (!container) return
 
-        const { scrollWidth, clientWidth } = container;
-        if (scrollWidth <= clientWidth) return;
+        const { scrollWidth, clientWidth } = container
+        if (scrollWidth <= clientWidth) return
 
         intervalRef.current = setInterval(() => {
-            const maxScroll = scrollWidth - clientWidth;
-            const scrollStep = scrollWidth / testimonials.length;
+            const maxScroll = scrollWidth - clientWidth
+            const scrollStep = scrollWidth / testimonials.length
 
             if (container.scrollLeft >= maxScroll - 150) {
-                container.scrollLeft = 0;
+                container.scrollLeft = 0
             } else {
-                container.scrollLeft += scrollStep;
+                container.scrollLeft += scrollStep
             }
-        }, 3000);
-    };
+        }, 3000)
+    }
 
     const renderStars = (rating) => {
         return [...Array(5)].map((_, i) => (
@@ -74,7 +30,7 @@ const Testimonial = () => {
                 key={i}
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
-                fill={i < rating ? "currentColor" : "none"}
+                fill={i < rating ? 'currentColor' : 'none'}
                 stroke="currentColor"
                 strokeWidth={i < rating ? 0 : 1.5}
                 className={`size-4 ${i < rating ? 'text-yellow-400' : 'text-gray-300'}`}
@@ -85,16 +41,16 @@ const Testimonial = () => {
                     clipRule="evenodd"
                 />
             </svg>
-        ));
-    };
+        ))
+    }
 
     useEffect(() => {
-        const timer = setTimeout(startAutoScroll, 100);
+        const timer = setTimeout(startAutoScroll, 100)
         return () => {
-            clearTimeout(timer);
-            if (intervalRef.current) clearInterval(intervalRef.current);
-        };
-    }, []);
+            clearTimeout(timer)
+            if (intervalRef.current) clearInterval(intervalRef.current)
+        }
+    }, [])
 
     return (
         <div className='py-8'>
@@ -132,7 +88,7 @@ const Testimonial = () => {
                 ))}
             </div>
         </div>
-    );
-};
+    )
+}
 
-export default Testimonial;
+export default Testimonial

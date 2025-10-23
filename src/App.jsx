@@ -3,7 +3,6 @@ import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom"
 
 import Admin from "./routes/admin";
 import Public from "./routes/public";
-import { PageNotFound } from "./pages";
 
 
 const App = () => {
