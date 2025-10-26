@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Users, BookOpen, GraduationCap, Globe, FileText, Mail, HelpCircle, Upload, Trash2, Plus, X } from 'lucide-react'
+import { dashboardService } from '../../services/dashboard'
 
 const Dashboard = () => {
     const [stats, setStats] = useState({
@@ -17,25 +18,17 @@ const Dashboard = () => {
     const [isUploading, setIsUploading] = useState(false)
     const maxImages = 5
 
+    const fetchFeaturedImages = async () => {
+        try {
+            const { data } = await dashboardService.getFeaturedImages()
+            setFeaturedImages(data.data)
+        } catch (error) {
+            console.error('Error fetching featured images:', error)
+        }
+    }
+
     useEffect(() => {
-        // Mock featured images data
-        setFeaturedImages([
-            {
-                id: '1',
-                url: '/api/placeholder/400/250',
-                createdAt: '2025-10-09T10:30:00Z'
-            },
-            {
-                id: '2',
-                url: '/api/placeholder/400/250',
-                createdAt: '2025-10-09T10:32:00Z'
-            },
-            {
-                id: '3',
-                url: '/api/placeholder/400/250',
-                createdAt: '2025-10-09T10:35:00Z'
-            }
-        ])
+        fetchFeaturedImages()
     }, [])
 
     const contentStats = [
@@ -63,30 +56,29 @@ const Dashboard = () => {
         return colors[color] || colors.blue
     }
 
-    const handleFileUpload = (e) => {
+    const handleFileUpload = async (e) => {
         const file = e.target.files[0]
         if (file && featuredImages.length < maxImages) {
             setIsUploading(true)
 
-            // Simulate upload delay
-            setTimeout(() => {
-                const newImage = {
-                    id: Date.now().toString(),
-                    url: URL.createObjectURL(file),
-                    createdAt: new Date().toISOString()
-                }
-                setFeaturedImages(prev => [...prev, newImage])
+            const response = (await dashboardService.uploadFeaturedImage(file)).data
+            if (response.data) {
+                setFeaturedImages(prev => [...prev, response.data])
                 setStats(prev => ({ ...prev, featuredImages: prev.featuredImages + 1 }))
-                setIsUploading(false)
-                e.target.value = '' // Reset file input
-            }, 1000)
+            }
+            setIsUploading(false)
+            e.target.value = '' // Reset file input
         }
     }
 
-    const handleDeleteImage = (imageId) => {
+    const handleDeleteImage = async (imageId) => {
         if (window.confirm('Are you sure you want to delete this image?')) {
-            setFeaturedImages(prev => prev.filter(img => img.id !== imageId))
-            setStats(prev => ({ ...prev, featuredImages: prev.featuredImages - 1 }))
+            const response = (await dashboardService.deleteFeaturedImage(imageId)).data
+            console.log('Delete response:', response)
+            if (response.success) {
+                setFeaturedImages(prev => prev.filter(img => img._id !== imageId))
+                setStats(prev => ({ ...prev, featuredImages: prev.featuredImages - 1 }))
+            }
         }
     }
 
@@ -190,43 +182,25 @@ const Dashboard = () => {
                             <p className="text-sm text-gray-600 mb-6">
                                 Upload images to display in your homepage hero section.
                             </p>
-                            <label className="animated-button cursor-pointer">
-                                <span className="label flex items-center gap-2">
-                                    <Plus size={16} />
-                                    Upload First Image
-                                </span>
-                                <input
-                                    type="file"
-                                    accept="image/*"
-                                    onChange={handleFileUpload}
-                                    className="hidden"
-                                />
-                            </label>
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {featuredImages.map((image) => (
-                                <div key={image.id} className="relative group">
-                                    <div className="aspect-video rounded-lg overflow-hidden border" style={{ backgroundColor: 'var(--accent-light)' }}>
-                                        <img
-                                            src={image.url}
-                                            alt="Featured"
-                                            className="w-full h-full object-cover"
-                                        />
-                                        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-200 flex items-center justify-center">
-                                            <button
-                                                onClick={() => handleDeleteImage(image.id)}
-                                                className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 p-2 rounded-full bg-red-600 text-white hover:bg-red-700"
-                                            >
-                                                <Trash2 size={16} />
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <div className="mt-2">
+                            {featuredImages.map((image, index) => (
+                                <div key={index} className="relative aspect-video bg-(--accent-light) rounded-sm p-2">
+                                    <img
+                                        src={image.url}
+                                        alt="Featured"
+                                        className="w-full h-full object-cover rounded-sm"
+                                    />
+                                    <div className="flex justify-between items-center p-4">
                                         <p className="text-xs text-gray-500">
                                             Uploaded on {formatDate(image.createdAt)}
                                         </p>
+                                        <button onClick={() => handleDeleteImage(image._id)} >
+                                            <Trash2 size={16} />
+                                        </button>
                                     </div>
+
                                 </div>
                             ))}
 

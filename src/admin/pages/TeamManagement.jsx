@@ -1,141 +1,188 @@
-import React, { useState, useEffect } from 'react'
-import { Plus, Search, Edit, Trash2, X, Upload, Youtube, User, ChevronLeft, ChevronRight } from 'lucide-react'
+import React, { useEffect, useMemo, useState } from 'react'
+import { Plus, Edit, Trash2, Upload, Youtube, User } from 'lucide-react'
+import AdminHeader from '../components/refactor/AdminHeader'
+import SearchInput from '../components/refactor/SearchInput'
+import ModalWrapper from '../components/refactor/ModalWrapper'
+import Pagination from '../components/refactor/Pagination'
+import { teamService } from '../../services/team'
+
+const ITEMS_PER_PAGE = 10
+
+const emptyForm = { id: '', name: '', designation: '', about: '', videoIntroductionUrl: '', profilePicture: null, enrolledCourses: [] }
 
 const TeamManagement = () => {
-    const [teamMembers, setTeamMembers] = useState([])
+    const [team, setTeam] = useState([])
+    const [loading, setLoading] = useState(false)
+    const [error, setError] = useState(null)
+
     const [isModalOpen, setIsModalOpen] = useState(false)
-    const [editingMember, setEditingMember] = useState(null)
-    const [searchTerm, setSearchTerm] = useState('')
-    const [currentPage, setCurrentPage] = useState(1)
-    const [availableCourses, setAvailableCourses] = useState([])
+    const [editing, setEditing] = useState(null)
+    const [form, setForm] = useState(emptyForm)
 
-    const [formData, setFormData] = useState({
-        id: '', name: '', designation: '', about: '', youtubeVideoUrl: '', profilePhoto: null, profilePhotoUrl: '', courses: []
-    })
+    // new: saving (for submit/upload) and previewUrl for image preview
+    const [saving, setSaving] = useState(false)
+    const [previewUrl, setPreviewUrl] = useState(null)
 
-    const itemsPerPage = 10
+    const [search, setSearch] = useState('')
+    const [page, setPage] = useState(1)
 
+    useEffect(() => { fetchTeam() }, [])
+
+    // cleanup preview on unmount
     useEffect(() => {
-        setTeamMembers([
-            { id: '1', name: 'Dr. John Doe', designation: 'IMAT Biology Tutor', about: 'Experienced biology tutor with 10+ years in medical entrance exam preparation.', youtubeVideoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', profilePhotoUrl: '/api/placeholder/50/50', courses: ['course1', 'course2'] },
-            { id: '2', name: 'Jane Smith', designation: 'Physics & Chemistry Expert', about: 'Specialized in physics and chemistry for IMAT preparation with proven track record.', youtubeVideoUrl: 'https://www.youtube.com/watch?v=abc123', profilePhotoUrl: '/api/placeholder/50/50', courses: ['course3'] }
-        ])
+        return () => {
+            if (previewUrl) {
+                URL.revokeObjectURL(previewUrl)
+            }
+        }
+    }, [previewUrl])
 
-        setAvailableCourses([
-            { id: 'course1', title: 'IMAT Foundation' },
-            { id: 'course2', title: 'Advanced Biology Course' },
-            { id: 'course3', title: 'IMAT Strategy 2025' },
-            { id: 'course4', title: 'Mock Test Program' }
-        ])
-    }, [])
-
-    const filteredMembers = teamMembers.filter(member =>
-        member.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        member.designation.toLowerCase().includes(searchTerm.toLowerCase())
-    )
-
-    const totalPages = Math.ceil(filteredMembers.length / itemsPerPage)
-    const startIndex = (currentPage - 1) * itemsPerPage
-    const currentMembers = filteredMembers.slice(startIndex, startIndex + itemsPerPage)
-
-    const handleInputChange = (e) => {
-        const { name, value } = e.target
-        setFormData(prev => ({ ...prev, [name]: value }))
-    }
-
-    const handleFileChange = (e) => {
-        const file = e.target.files[0]
-        if (file) {
-            setFormData(prev => ({ ...prev, profilePhoto: file, profilePhotoUrl: URL.createObjectURL(file) }))
+    const fetchTeam = async () => {
+        setLoading(true)
+        setError(null)
+        try {
+            const res = await teamService.getAll()
+            const data = res?.data?.data
+            setTeam(Array.isArray(data) ? data : [])
+        } catch (err) {
+            console.error(err)
+            setError('Failed to load team members')
+        } finally {
+            setLoading(false)
         }
     }
 
-    const handleCourseChange = (courseId) => {
-        setFormData(prev => ({
-            ...prev,
-            courses: prev.courses.includes(courseId)
-                ? prev.courses.filter(id => id !== courseId)
-                : [...prev.courses, courseId]
-        }))
+    const saveMember = async (e) => {
+        e.preventDefault()
+        setSaving(true)
+        try {
+            if (editing) {
+                let response
+                // If a new file was selected, form.profilePicture will be a File
+                if (form.profilePicture instanceof File) {
+                    const fd = new FormData()
+                    Object.entries(form).forEach(([key, value]) => {
+                        if (value !== null && value !== undefined) {
+                            // append file only if it's a File; append other fields as strings
+                            if (key === 'profilePicture') {
+                                fd.append('profilePicture', value)
+                            } else if (Array.isArray(value)) {
+                                fd.append(key, JSON.stringify(value))
+                            } else {
+                                fd.append(key, value)
+                            }
+                        }
+                    })
+                    response = await teamService.update(editing._id, fd)
+                } else {
+                    const payload = { ...form }
+                    delete payload.profilePicture
+                    response = await teamService.update(editing._id, payload)
+                }
+
+                const updatedMember = response.data?.data
+
+                console.log('Update response:', updatedMember)
+                if (updatedMember) {
+                    setTeam(prev => prev.map(m => m._id === updatedMember._id ? updatedMember : m))
+                }
+            } else {
+                const fd = new FormData()
+                Object.entries(form).forEach(([key, value]) => {
+                    if (value !== null && value !== undefined) {
+                        if (key === 'profilePicture') {
+                            if (value instanceof File) {
+                                fd.append(key, value)
+                            }
+                        } else if (Array.isArray(value)) {
+                            fd.append(key, JSON.stringify(value))
+                        } else {
+                            fd.append(key, value)
+                        }
+                    }
+                })
+                const response = await teamService.create(fd)
+                console.log('Create response:', response)
+                const savedMember = response.data?.data
+                if (savedMember) setTeam(prev => [...prev, savedMember])
+            }
+            closeModal()
+        } catch (err) {
+            console.error(err)
+            setError('Failed to save member')
+        } finally {
+            setSaving(false)
+        }
     }
 
-    const resetForm = () => {
-        setFormData({ id: '', name: '', designation: '', about: '', youtubeVideoUrl: '', profilePhoto: null, profilePhotoUrl: '', courses: [] })
+    const deleteMember = async (id) => {
+        if (!window.confirm('Delete this member?')) return
+        try {
+            // use _id for consistency
+            setTeam(prev => prev.filter(m => m._id !== id))
+            await teamService.delete(id)
+        } catch (err) {
+            console.error(err)
+            setError('Failed to delete member')
+            fetchTeam()
+        }
     }
 
-    const openAddModal = () => {
-        resetForm()
-        setEditingMember(null)
+    const openAdd = () => { setForm(emptyForm); setEditing(null); setIsModalOpen(true); if (previewUrl) { URL.revokeObjectURL(previewUrl); setPreviewUrl(null) } }
+    const openEdit = (member) => {
+        // keep existing profilePicture URL in form as string; this will not be sent unless replaced with a File
+        setForm({ ...member })
+        setEditing(member)
         setIsModalOpen(true)
+        if (previewUrl) {
+            URL.revokeObjectURL(previewUrl)
+        }
+        setPreviewUrl(member?.profilePicture || null)
     }
-
-    const openEditModal = (member) => {
-        setFormData({ ...member, profilePhoto: null })
-        setEditingMember(member)
-        setIsModalOpen(true)
-    }
-
     const closeModal = () => {
         setIsModalOpen(false)
-        setEditingMember(null)
-        resetForm()
-    }
-
-    const handleSubmit = (e) => {
-        e.preventDefault()
-        if (editingMember) {
-            setTeamMembers(prev => prev.map(member =>
-                member.id === editingMember.id ? { ...formData, id: editingMember.id } : member
-            ))
-        } else {
-            setTeamMembers(prev => [...prev, { ...formData, id: Date.now().toString() }])
-        }
-        closeModal()
-    }
-
-    const handleDelete = (memberId) => {
-        if (window.confirm('Are you sure you want to delete this team member?')) {
-            setTeamMembers(prev => prev.filter(member => member.id !== memberId))
+        setEditing(null)
+        setForm(emptyForm)
+        if (previewUrl) {
+            URL.revokeObjectURL(previewUrl)
+            setPreviewUrl(null)
         }
     }
 
-    const getCourseCount = (memberCourses) => memberCourses?.length || 0
+    const onFile = (e) => {
+        const f = e.target.files?.[0]
+        if (!f) return
+        // revoke previous preview
+        if (previewUrl) {
+            URL.revokeObjectURL(previewUrl)
+        }
+        const url = URL.createObjectURL(f)
+        setPreviewUrl(url)
+        setForm(prev => ({ ...prev, profilePicture: f }))
+    }
+
+    // memoized filtering + pagination
+    const filtered = useMemo(() => {
+        const q = search.trim().toLowerCase()
+        if (!q) return team
+        return team.filter(m => (m.name || '').toLowerCase().includes(q) || (m.designation || '').toLowerCase().includes(q))
+    }, [team, search])
+
+    const totalPages = Math.max(1, Math.ceil(filtered.length / ITEMS_PER_PAGE))
+    const startIndex = (page - 1) * ITEMS_PER_PAGE
+    const pageItems = filtered.slice(startIndex, startIndex + ITEMS_PER_PAGE)
 
     const extractYouTubeId = (url) => {
-        const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/)
+        const match = url?.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/)
         return match ? match[1] : null
     }
 
     return (
         <div className="max-w-6xl mx-auto space-y-6 bg-white">
-            {/* Header */}
-            <div className="mb-8">
-                <div className="flex justify-between items-center mb-2">
-                    <h1 className="text-3xl font-medium" style={{ color: 'var(--accent-dark)' }}>Team Members</h1>
-                    <button onClick={openAddModal} className="animated-button">
-                        <span className="label flex items-center gap-2">
-                            <Plus size={20} />
-                            Add Member
-                        </span>
-                    </button>
-                </div>
-                <p className="text-sm text-gray-600">{filteredMembers.length} team members</p>
-            </div>
+            <AdminHeader title="Team Members" count={filtered.length} onAdd={openAdd} addLabel="Add Member" addIcon={<Plus size={20} />} />
 
-            {/* Search */}
-            <input
-                type="text"
-                placeholder="Search by name or designation"
-                className="w-full max-w-md py-3 px-4 rounded-lg border-0 focus:outline-none focus:ring-2"
-                style={{
-                    backgroundColor: 'var(--accent-light)',
-                    color: 'var(--secondary)'
-                }}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-            />
+            <SearchInput value={search} onChange={setSearch} placeholder="Search by name or designation" />
 
-            {/* Table */}
             <div className="bg-white rounded-lg overflow-scroll shadow-sm border" style={{ borderColor: 'var(--accent-light)' }}>
                 <table className="w-full">
                     <thead>
@@ -149,13 +196,19 @@ const TeamManagement = () => {
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
-                        {currentMembers.map((member, index) => (
-                            <tr key={member.id} className="hover:bg-gray-50 transition-colors duration-150">
-                                <td className="py-4 px-6 text-sm text-gray-500">{startIndex + index + 1}</td>
+                        {loading && (
+                            <tr><td colSpan={6} className="py-8 text-center text-sm text-gray-500">Loading...</td></tr>
+                        )}
+                        {!loading && pageItems.length === 0 && (
+                            <tr><td colSpan={6} className="py-8 text-center text-sm text-gray-500">No team members found</td></tr>
+                        )}
+                        {pageItems.map((member, idx) => (
+                            <tr key={idx} className="hover:bg-gray-50 transition-colors duration-150">
+                                <td className="py-4 px-6 text-sm text-gray-500">{startIndex + idx + 1}</td>
                                 <td className="py-4 px-6">
                                     <div className="h-10 w-10 rounded-full overflow-hidden border" style={{ backgroundColor: 'var(--accent-light)', borderColor: 'var(--accent-dark)' }}>
-                                        {member.profilePhotoUrl ? (
-                                            <img src={member.profilePhotoUrl} alt={member.name} className="h-full w-full object-cover" />
+                                        {member.profilePicture ? (
+                                            <img src={member.profilePicture.url} alt={member.name} className="h-full w-full object-cover" />
                                         ) : (
                                             <div className="h-full w-full flex items-center justify-center">
                                                 <User className="h-5 w-5" style={{ color: 'var(--accent-dark)' }} />
@@ -167,22 +220,15 @@ const TeamManagement = () => {
                                 <td className="py-4 px-6 text-sm text-gray-500">{member.designation}</td>
                                 <td className="py-4 px-6">
                                     <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap" style={{ backgroundColor: 'var(--accent-light)' }}>
-                                        {getCourseCount(member.courses)} Course{getCourseCount(member.courses) !== 1 ? 's' : ''}
+                                        {(member.enrolledCourses || []).length} Course{(member.enrolledCourses || []).length !== 1 ? 's' : ''}
                                     </span>
                                 </td>
                                 <td className="py-4 px-6">
                                     <div className="flex gap-2">
-                                        <button
-                                            onClick={() => openEditModal(member)}
-                                            className="p-2 rounded hover:bg-gray-100 transition-colors"
-                                            style={{ color: 'var(--accent-dark)' }}
-                                        >
+                                        <button onClick={() => openEdit(member)} className="p-2 rounded hover:bg-gray-100 transition-colors" style={{ color: 'var(--accent-dark)' }}>
                                             <Edit size={16} />
                                         </button>
-                                        <button
-                                            onClick={() => handleDelete(member.id)}
-                                            className="p-2 rounded hover:bg-red-50 transition-colors text-red-600"
-                                        >
+                                        <button onClick={() => deleteMember(member._id)} className="p-2 rounded hover:bg-red-50 transition-colors text-red-600">
                                             <Trash2 size={16} />
                                         </button>
                                     </div>
@@ -193,272 +239,68 @@ const TeamManagement = () => {
                 </table>
             </div>
 
-            {/* Pagination */}
-            {totalPages > 1 && (
-                <div className="flex items-center flex-wrap-reverse justify-between mt-6">
-                    <p className="text-sm text-gray-600 p-2">
-                        Showing {startIndex + 1} to {Math.min(startIndex + itemsPerPage, filteredMembers.length)} of {filteredMembers.length}
-                    </p>
+            <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} itemsPerPage={ITEMS_PER_PAGE} startIndex={startIndex} totalItems={filtered.length} />
 
-                    <div className="flex items-center space-x-2">
-                        <button
-                            onClick={() => setCurrentPage(currentPage - 1)}
-                            disabled={currentPage === 1}
-                            className={`px-3 py-2 text-sm rounded-md transition-colors ${currentPage === 1
-                                ? 'text-gray-400 cursor-not-allowed'
-                                : 'text-gray-700 hover:bg-gray-100'
-                                }`}
-                        >
-                            Previous
-                        </button>
-
-                        <div className="flex space-x-1">
-                            {[...Array(Math.min(5, totalPages))].map((_, index) => {
-                                let pageNumber;
-                                if (totalPages <= 5) {
-                                    pageNumber = index + 1;
-                                } else if (currentPage <= 3) {
-                                    pageNumber = index + 1;
-                                } else if (currentPage >= totalPages - 2) {
-                                    pageNumber = totalPages - 4 + index;
-                                } else {
-                                    pageNumber = currentPage - 2 + index;
-                                }
-
-                                return (
-                                    <button
-                                        key={pageNumber}
-                                        onClick={() => setCurrentPage(pageNumber)}
-                                        className={`w-8 h-8 text-sm rounded-md transition-colors ${currentPage === pageNumber
-                                            ? 'text-gray-900'
-                                            : 'text-gray-700 hover:bg-gray-100'
-                                            }`}
-                                        style={{
-                                            backgroundColor: currentPage === pageNumber ? 'var(--accent-light)' : 'transparent'
-                                        }}
-                                    >
-                                        {pageNumber}
-                                    </button>
-                                );
-                            })}
-                        </div>
-
-                        <button
-                            onClick={() => setCurrentPage(currentPage + 1)}
-                            disabled={currentPage === totalPages}
-                            className={`px-3 py-2 text-sm rounded-md transition-colors ${currentPage === totalPages
-                                ? 'text-gray-400 cursor-not-allowed'
-                                : 'text-gray-700 hover:bg-gray-100'
-                                }`}
-                        >
-                            Next
-                        </button>
-                    </div>
-                </div>
-            )}
-
-            {/* Modal with Blur Background */}
-            {isModalOpen && (
-                <div className="fixed inset-0 z-50 overflow-y-auto">
-                    <div className="flex items-center justify-center min-h-screen px-4">
-                        {/* Blur Background */}
-                        <div
-                            className="fixed inset-0 bg-gray-500 bg-opacity-75 backdrop-blur-sm transition-opacity"
-                            onClick={closeModal}
-                        ></div>
-
-                        {/* Modal Content */}
-                        <div className="relative bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-                            <div className="flex justify-between items-center p-6 border-b" style={{ borderColor: 'var(--accent-light)' }}>
-                                <h2 className="text-xl font-medium" style={{ color: 'var(--accent-dark)' }}>
-                                    {editingMember ? 'Edit Team Member' : 'Add Team Member'}
-                                </h2>
-                                <button
-                                    onClick={closeModal}
-                                    className="p-2 rounded hover:bg-gray-100 transition-colors"
-                                    style={{ color: 'var(--accent-dark)' }}
-                                >
-                                    <X size={24} />
-                                </button>
+            <ModalWrapper isOpen={isModalOpen} onClose={closeModal} title={editing ? 'Edit Team Member' : 'Add Team Member'} maxWidth="max-w-2xl">
+                <form onSubmit={saveMember} className="space-y-6">
+                    <div>
+                        <label className="block text-sm font-medium mb-2" style={{ color: 'var(--accent-dark)' }}>Profile Photo</label>
+                        <div className="flex items-center gap-4">
+                            <div className="h-16 w-16 rounded-full overflow-hidden border-2 border-dashed flex items-center justify-center" style={{ backgroundColor: 'var(--accent-light)', borderColor: 'var(--accent-dark)' }}>
+                                {previewUrl ? (
+                                    <img src={previewUrl} alt="Preview" className="h-full w-full object-cover" />
+                                ) : (form.profilePicture && typeof form.profilePicture === 'string') ? (
+                                    <img src={form.profilePicture} alt="Preview" className="h-full w-full object-cover" />
+                                ) : (
+                                    <Upload className="h-6 w-6" style={{ color: 'var(--accent-dark)' }} />
+                                )}
                             </div>
-
-                            <form onSubmit={handleSubmit} className="p-6 space-y-6">
-                                {/* Photo */}
-                                <div>
-                                    <label className="block text-sm font-medium mb-2" style={{ color: 'var(--accent-dark)' }}>
-                                        Profile Photo
-                                    </label>
-                                    <div className="flex items-center gap-4">
-                                        <div
-                                            className="h-16 w-16 rounded-full overflow-hidden border-2 border-dashed flex items-center justify-center"
-                                            style={{ backgroundColor: 'var(--accent-light)', borderColor: 'var(--accent-dark)' }}
-                                        >
-                                            {formData.profilePhotoUrl ? (
-                                                <img src={formData.profilePhotoUrl} alt="Preview" className="h-full w-full object-cover" />
-                                            ) : (
-                                                <Upload className="h-6 w-6" style={{ color: 'var(--accent-dark)' }} />
-                                            )}
-                                        </div>
-                                        <input type="file" accept="image/*" onChange={handleFileChange} className="hidden" id="photo-upload" />
-                                        <label htmlFor="photo-upload" className="animated-button cursor-pointer">
-                                            <span className="label">Choose Photo</span>
-                                        </label>
-                                    </div>
-                                </div>
-
-                                {/* Name */}
-                                <div>
-                                    <label className="block text-sm font-medium mb-2" style={{ color: 'var(--accent-dark)' }}>
-                                        Name *
-                                    </label>
-                                    <input
-                                        type="text"
-                                        name="name"
-                                        value={formData.name}
-                                        onChange={handleInputChange}
-                                        required
-                                        className="w-full px-4 py-3 rounded-lg border-0 focus:outline-none focus:ring-2"
-                                        style={{
-                                            backgroundColor: 'var(--accent-light)',
-                                            color: 'var(--secondary)'
-                                        }}
-                                        placeholder="Enter full name"
-                                    />
-                                </div>
-
-                                {/* Designation */}
-                                <div>
-                                    <label className="block text-sm font-medium mb-2" style={{ color: 'var(--accent-dark)' }}>
-                                        Designation *
-                                    </label>
-                                    <input
-                                        type="text"
-                                        name="designation"
-                                        value={formData.designation}
-                                        onChange={handleInputChange}
-                                        required
-                                        className="w-full px-4 py-3 rounded-lg border-0 focus:outline-none focus:ring-2"
-                                        style={{
-                                            backgroundColor: 'var(--accent-light)',
-                                            color: 'var(--secondary)'
-                                        }}
-                                        placeholder="e.g., IMAT Biology Tutor"
-                                    />
-                                </div>
-
-                                {/* About */}
-                                <div>
-                                    <label className="block text-sm font-medium mb-2" style={{ color: 'var(--accent-dark)' }}>
-                                        About
-                                    </label>
-                                    <textarea
-                                        name="about"
-                                        value={formData.about}
-                                        onChange={handleInputChange}
-                                        rows={3}
-                                        maxLength={400}
-                                        className="w-full px-4 py-3 rounded-lg border-0 focus:outline-none focus:ring-2"
-                                        style={{
-                                            backgroundColor: 'var(--accent-light)',
-                                            color: 'var(--secondary)'
-                                        }}
-                                        placeholder="Short bio (max 400 characters)"
-                                    />
-                                    <div className="text-xs mt-1" style={{ color: 'var(--accent-dark)' }}>
-                                        {formData.about.length}/400 characters
-                                    </div>
-                                </div>
-
-                                {/* YouTube */}
-                                <div>
-                                    <label className="block text-sm font-medium mb-2" style={{ color: 'var(--accent-dark)' }}>
-                                        YouTube Video URL
-                                    </label>
-                                    <div className="relative">
-                                        <Youtube className="absolute left-3 top-1/2 transform -translate-y-1/2" style={{ color: 'var(--accent-dark)' }} size={20} />
-                                        <input
-                                            type="url"
-                                            name="youtubeVideoUrl"
-                                            value={formData.youtubeVideoUrl}
-                                            onChange={handleInputChange}
-                                            className="w-full pl-12 pr-4 py-3 rounded-lg border-0 focus:outline-none focus:ring-2"
-                                            style={{
-                                                backgroundColor: 'var(--accent-light)',
-                                                color: 'var(--secondary)'
-                                            }}
-                                            placeholder="https://www.youtube.com/watch?v=..."
-                                        />
-                                    </div>
-                                    {formData.youtubeVideoUrl && extractYouTubeId(formData.youtubeVideoUrl) && (
-                                        <div className="mt-3">
-                                            <div className="aspect-video w-full max-w-sm">
-                                                <iframe
-                                                    width="100%"
-                                                    height="100%"
-                                                    src={`https://www.youtube.com/embed/${extractYouTubeId(formData.youtubeVideoUrl)}`}
-                                                    title="Preview"
-                                                    frameBorder="0"
-                                                    allowFullScreen
-                                                    className="rounded-lg"
-                                                ></iframe>
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-
-                                {/* Courses */}
-                                <div>
-                                    <label className="block text-sm font-medium mb-2" style={{ color: 'var(--accent-dark)' }}>
-                                        Courses
-                                    </label>
-                                    <div className="space-y-3 rounded-lg p-4" style={{ backgroundColor: 'var(--accent-light)' }}>
-                                        {availableCourses.map(course => (
-                                            <label key={course.id} className="flex items-center gap-3 cursor-pointer">
-                                                <input
-                                                    type="checkbox"
-                                                    checked={formData.courses.includes(course.id)}
-                                                    onChange={() => handleCourseChange(course.id)}
-                                                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                                                />
-                                                <span className="text-sm" style={{ color: 'var(--accent-dark)' }}>{course.title}</span>
-                                            </label>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                {/* Actions */}
-                                <div className="flex justify-end gap-3 pt-4 border-t" style={{ borderColor: 'var(--accent-light)' }}>
-                                    <button type="button" onClick={closeModal} className="animated-button">
-                                        <span className="label">Cancel</span>
-                                    </button>
-                                    <button type="submit" className="animated-button">
-                                        <span className="label">{editingMember ? 'Update' : 'Save'}</span>
-                                    </button>
-                                </div>
-                            </form>
+                            <input id="photo" name='profilePicture' type="file" accept="image/*" onChange={onFile} className="hidden" />
+                            <label htmlFor="photo" className="animated-button cursor-pointer"><span className="label">Choose Photo</span></label>
                         </div>
                     </div>
-                </div>
-            )}
 
-            {/* Empty State */}
-            {filteredMembers.length === 0 && (
-                <div className="text-center py-16">
-                    <User className="mx-auto h-12 w-12 mb-4" style={{ color: 'var(--accent-dark)' }} />
-                    <h3 className="text-lg font-medium mb-2" style={{ color: 'var(--accent-dark)' }}>No team members found</h3>
-                    <p className="text-sm mb-6 text-gray-600">
-                        {searchTerm ? 'Try adjusting your search criteria.' : 'Get started by adding your first team member.'}
-                    </p>
-                    {!searchTerm && (
-                        <button onClick={openAddModal} className="animated-button">
-                            <span className="label flex items-center gap-2">
-                                <Plus size={16} />
-                                Add Team Member
-                            </span>
+                    <div>
+                        <label className="block text-sm font-medium mb-2" style={{ color: 'var(--accent-dark)' }}>Name *</label>
+                        <input required name="name" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} className="w-full px-4 py-3 rounded-lg border-0 focus:outline-none focus:ring-2" style={{ backgroundColor: 'var(--accent-light)', color: 'var(--secondary)' }} placeholder="Enter full name" />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium mb-2" style={{ color: 'var(--accent-dark)' }}>Designation *</label>
+                        <input required name="designation" value={form.designation} onChange={e => setForm(f => ({ ...f, designation: e.target.value }))} className="w-full px-4 py-3 rounded-lg border-0 focus:outline-none focus:ring-2" style={{ backgroundColor: 'var(--accent-light)', color: 'var(--secondary)' }} placeholder="e.g., IMAT Biology Tutor" />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium mb-2" style={{ color: 'var(--accent-dark)' }}>About</label>
+                        <textarea name="about" value={form.about} onChange={e => setForm(f => ({ ...f, about: e.target.value }))} rows={3} maxLength={400} className="w-full px-4 py-3 rounded-lg border-0 focus:outline-none focus:ring-2" style={{ backgroundColor: 'var(--accent-light)', color: 'var(--secondary)' }} placeholder="Short bio (max 400 characters)" />
+                        <div className="text-xs mt-1" style={{ color: 'var(--accent-dark)' }}>{form.about.length}/400 characters</div>
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium mb-2" style={{ color: 'var(--accent-dark)' }}>YouTube Video URL</label>
+                        <div className="relative">
+                            <Youtube className="absolute left-3 top-1/2 transform -translate-y-1/2" style={{ color: 'var(--accent-dark)' }} size={20} />
+                            <input type="url" name="videoIntroductionUrl" value={form.videoIntroductionUrl} onChange={e => setForm(f => ({ ...f, videoIntroductionUrl: e.target.value }))} className="w-full pl-12 pr-4 py-3 rounded-lg border-0 focus:outline-none focus:ring-2" style={{ backgroundColor: 'var(--accent-light)', color: 'var(--secondary)' }} placeholder="https://www.youtube.com/watch?v=..." />
+                        </div>
+                        {form.videoIntroductionUrl && extractYouTubeId(form.videoIntroductionUrl) && (
+                            <div className="mt-3">
+                                <div className="aspect-video w-full max-w-sm">
+                                    <iframe width="100%" height="100%" src={`https://www.youtube.com/embed/${extractYouTubeId(form.videoIntroductionUrl)}`} title="Preview" frameBorder="0" allowFullScreen className="rounded-lg" />
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="flex justify-end gap-3 pt-4 border-t" style={{ borderColor: 'var(--accent-light)' }}>
+                        <button type="button" onClick={closeModal} className="animated-button"><span className="label">Cancel</span></button>
+                        <button type="submit" disabled={saving} className="animated-button">
+                            <span className="label">{saving ? (editing ? 'Updating...' : 'Saving...') : (editing ? 'Update' : 'Save')}</span>
                         </button>
-                    )}
-                </div>
-            )}
+                    </div>
+                </form>
+            </ModalWrapper>
+
+            {error && <div className="text-sm text-red-600">{error}</div>}
         </div>
     )
 }
