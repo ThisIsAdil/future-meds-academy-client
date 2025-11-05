@@ -1,9 +1,23 @@
-import React, { useEffect, useRef } from 'react'
-import testimonials from '../../data/testimonials'
+import React, { useEffect, useRef, useState } from 'react'
+import { testimonialService } from '../../services/testimonial'
 
 const Testimonial = () => {
+    const [testimonials, setTestimonials] = useState([])
     const containerRef = useRef(null)
     const intervalRef = useRef(null)
+
+    const fetchTestimonials = async () => {
+        try {
+            const response = await testimonialService.getAll();
+            setTestimonials(response.data.data);
+        } catch (error) {
+            console.error("Error fetching testimonials:", error);
+        }
+    };
+
+    useEffect(() => {
+        fetchTestimonials();
+    }, []);
 
     const startAutoScroll = () => {
         const container = containerRef.current

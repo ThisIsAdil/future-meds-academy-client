@@ -4,3 +4,4 @@ export { default as Banner } from "./Banner"
 export { default as FAQ } from "./FAQ"
 export { default as SmartImage } from './SmartImage'
 export { default as AnimatedButton } from './AnimatedButton'
+export { default as Loader } from './Loader'

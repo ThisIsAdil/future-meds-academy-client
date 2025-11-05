@@ -1,10 +1,26 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import courses from '../../data/courses'
 import AnimatedButton from '../../components/AnimatedButton'
 import { ArrowRight } from 'lucide-react'
 
+import { courseService } from '../../services/courses'
+
 const Courses = () => {
+    const [courses, setCourses] = useState([])
+
+    const fetchCourses = async () => {
+        try {
+            const response = await courseService.getAll()
+            setCourses(response?.data?.data)
+        } catch (error) {
+            console.error("Error fetching courses:", error)
+        }
+    }
+
+    useEffect(() => {
+        fetchCourses()
+    }, [])
+
     return (
         <section className='py-20 px-6 bg-(--accent-light)'>
             <div className='max-w-5xl mx-auto'>
@@ -19,7 +35,7 @@ const Courses = () => {
 
                 <div className='grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto'>
                     {courses.map((course, index) => (
-                        <div key={course.id} className={`relative bg-(--accent-dark) text-(--accent-light) p-8 rounded-lg`}>
+                        <div key={course._id} className={`relative bg-(--accent-dark) text-(--accent-light) p-8 rounded-lg`}>
                             {index === 0 && (
                                 <div className='absolute -top-3 left-8'>
                                     <span className='bg-(--accent-light) text-(--accent-dark) border border-(--accent-dark) px-3 py-1 text-sm font-medium rounded'>
@@ -32,16 +48,15 @@ const Courses = () => {
                                 <h3 className='text-xl font-semibold mb-2'>
                                     {course.title}
                                 </h3>
-                                <p className='text-gray-300'>{course.tagline}</p>
                             </div>
 
                             <div className='mb-6 pb-6 border-b'>
                                 <div className='flex items-baseline gap-2 mb-1'>
-                                    {course.price.original && (
-                                        <span className='line-through'>{course.price.original}</span>
+                                    {course.price && (
+                                        <span className='line-through'>€{course.price + 30}</span>
                                     )}
                                     <span className='text-3xl font-bold'>
-                                        {course.price.discounted || course.price.monthly}
+                                        {course.price}
                                     </span>
                                     <span className=''>{course.price.period}</span>
                                 </div>
@@ -51,7 +66,7 @@ const Courses = () => {
                             </div>
 
                             <ul className='space-y-3 mb-8'>
-                                {course.features.map((feature, featureIndex) => (
+                                {course.whyChoose.map((feature, featureIndex) => (
                                     <li key={featureIndex} className='flex items-start gap-3'>
                                         <div className='w-4 h-4 bg-green-400 rounded-full flex items-center justify-center mt-1 flex-shrink-0'>
                                             <svg className='w-2.5 h-2.5 text-white' fill='currentColor' viewBox='0 0 20 20'>
@@ -63,9 +78,11 @@ const Courses = () => {
                                 ))}
                             </ul>
 
-                            <button className={`py-3 px-6 font-medium bg-(--accent-light) text-(--accent-dark) hover:scale-[1.02] transition-all cursor-pointer`}>
-                                {course.cta}
-                            </button>
+                            <Link to={`/courses/syllabus/${course._id}`}>
+                                <button className={`py-3 px-6 font-medium bg-(--accent-light) text-(--accent-dark) hover:scale-[1.02] transition-all cursor-pointer`}>
+                                    Enroll Now
+                                </button>
+                            </Link>
                         </div>
                     ))}
                 </div>

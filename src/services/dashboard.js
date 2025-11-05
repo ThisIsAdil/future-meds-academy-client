@@ -1,6 +1,7 @@
 import axiosClient from "../api/axiosClient";
 
 export const dashboardService = {
+    getStats: () => axiosClient.get("/dashboard/stats"),
     getFeaturedImages: () => axiosClient.get("/dashboard/featured-images"),
     uploadFeaturedImage: (file) => {
         const formData = new FormData()

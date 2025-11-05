@@ -1,146 +1,161 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
+import React, { useEffect, useState } from 'react'
+import ReactMarkdown from "react-markdown";
+import { useParams, Link } from 'react-router-dom'
+import { Loader } from '../components'
+import { blogService } from '../services/blog'
 
 const Blog = () => {
-  const blog = {
-    _id: "66f2a1b5c8d4e5f6a7b8c9d0",
-    meta: {
-      thumbnail: "/assets/universities/thumbnail/turin.webp",
-      youtubeEmbedId: "geejWrV0UMo",
-      tag: "Universities in Italy",
-      publishedAt: "2025-09-24T10:30:00Z",
-      author: "Amir Akhtar"
-    },
-    title: "IMAT Preparation Tips 2025: Study Smarter, Not Harder",
-    description: "Learn how to build an effective IMAT study plan with proven strategies, past papers, and mock test practice.",
-    content: {
-      introduction: "Preparing for the IMAT exam can feel overwhelming. In this guide, I walk you through a 3-month strategy to stay consistent, improve scores, and reduce stress — using real student examples and proven methods.",
-      main: [
-        {
-          "headline": "Plan Your Study Schedule",
-          "p": "A structured study plan helps you avoid last-minute stress and ensures every subject is covered. Without a schedule, it’s easy to over-focus on one subject and neglect others.",
-          "ul": [
-            "Start with a full diagnostic test",
-            "Divide the IMAT syllabus into weekly modules",
-            "Keep buffer days for revision and practice"
-          ]
-        },
-        {
-          "headline": "Practice with Past Year Questions",
-          "p": "Past IMAT papers are the most valuable resource to understand the exam pattern and difficulty level. Treat them like real exams to get the most benefit.",
-          "ul": [
-            "Download official IMAT papers from past years",
-            "Take them under timed exam-like conditions",
-            "Review mistakes thoroughly and create error notes"
-          ],
-          "quote": "The best way to predict your future score is by analyzing your past mistakes."
-        },
-        {
-          "headline": "Use Mock Tests for Feedback",
-          "p": "Mocks help simulate the real exam experience and highlight weak areas. Ranking systems allow you to compare your performance with other aspirants.",
-          "ul": [
-            "Take bi-weekly full-length mocks",
-            "Track recurring problem areas",
-            "Adapt your study plan based on results"
-          ]
-        },
-        {
-          "headline": "Improve Time Management & Strategy",
-          "p": "Even if you know the concepts, poor time management can cost you valuable marks. The key is knowing what to solve first and when to skip.",
-          "ul": [
-            "Answer easy questions first to secure quick marks",
-            "Use shortcuts for logical reasoning",
-            "Skip and return to tough questions later"
-          ],
-          "quote": "Don’t get stuck on a single problem—move forward and come back later.",
-          "cta": {
-            "label": "Join Our Free IMAT Strategy Webinar",
-            "link": "/webinars/imat-strategy"
-          }
-        }
-      ],
-      relatedLinks: [
-        {
-          title: "Official IMAT Past Papers",
-          url: "https://www.universitaly.it/index.php/medicina-in-italia/imat",
-          description: "Download past IMAT exam papers directly from the official Universitaly website."
-        },
-        {
-          title: "Top 10 IMAT Preparation Books",
-          url: "https://futuremedsacademy.com/imat-books",
-          description: "A curated list of the best books to help you prepare effectively for the IMAT exam."
-        }
-      ],
-      tags: ["IMAT", "Study Tips", "Exam Preparation", "Medical School"]
-    }
-  }
+  const { id } = useParams()
+  const [blog, setBlog] = useState(null)
+  const [loading, setLoading] = useState(true)
 
+  useEffect(() => {
+    const fetchBlog = async () => {
+      try {
+        const res = await blogService.getById(id)
+        const data = res?.data?.data || null
+        if (!data) throw new Error('No blog found')
+
+        // ✅ Extract YouTube video ID (supports multiple formats)
+        let youtubeEmbedId = ''
+        if (data.youtubeUrl) {
+          const match = data.youtubeUrl.match(
+            /(?:youtube\.com\/.*v=|youtu\.be\/)([^&\n?#]+)/i
+          )
+          youtubeEmbedId = match ? match[1] : ''
+        }
+
+        setBlog({
+          ...data,
+          youtubeEmbedId,
+        })
+      } catch (error) {
+        console.error('Failed to load blog:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchBlog()
+  }, [id])
+  console.log('Fetched blog:', blog)
+
+  if (loading) return <Loader />
+  if (!blog) return <div className="text-center py-20 text-gray-500">Blog not found.</div>
 
   return (
-    <div className='max-w-4xl mx-auto'>
-      <div className='space-y-2 px-4 py-4'>
-        <iframe className=' aspect-video rounded-lg my-8' src={`https://www.youtube.com/embed/${blog.meta.youtubeEmbedId}?si=UEMvm-0RLx8_MCJP`} title="YouTube video player" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen></iframe>
-        <h1 className='text-2xl font-bold'>{blog.title}</h1>
-        <ul className='flex items-center gap-4 text-sm text-gray-600 flex-wrap'>
-          <li className='border-r border-gray-400 pr-4'>Date: {new Date(blog.meta.publishedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</li>
-          <li className='border-r border-gray-400 pr-4'>Author: {blog.meta.author}</li>
-          <li>Tag: {blog.meta.tag}</li>
+    <div className="max-w-4xl mx-auto my-16">
+      <div className="space-y-2 px-4 py-4">
+        {blog.youtubeEmbedId && (
+          <iframe
+            className="aspect-video rounded-lg my-8 w-full"
+            src={`https://www.youtube.com/embed/${blog.youtubeEmbedId}`}
+            title="YouTube video player"
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerPolicy="strict-origin-when-cross-origin"
+            allowFullScreen
+          ></iframe>
+        )}
+
+        <h1 className="text-3xl font-bold">{blog.title}</h1>
+
+        <ul className="flex items-center gap-4 text-sm text-gray-600 flex-wrap">
+          <li className="border-r border-gray-400 pr-4">
+            Date:{' '}
+            {blog.publishedAt
+              ? new Date(blog.publishedAt).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+              })
+              : '—'}
+          </li>
+          <li className="border-r border-gray-400 pr-4">
+            Author: {blog.author}
+          </li>
+          <li>Tag: {blog.tag || '—'}</li>
         </ul>
       </div>
-      <div className='px-4 pb-8'>
-        <h2 className='text-xl font-semibold'>Introduction:</h2>
-        <p className='text-justify'>{blog.content.introduction}</p>
-      </div>
-      <div className='px-4 space-y-2 pb-8'>
-        {blog.content.main.map((section, i) => (
-          <div key={i} className="mb-8">
-            <h2 className="text-lg font-semibold">{section.headline}</h2>
-            {section.p && <p>{section.p}</p>}
-            {section.ul && (
-              <ul className="list-disc ml-6 my-2">
-                {section.ul.map((item, idx) => <li key={idx}>{item}</li>)}
-              </ul>
-            )}
-            {section.quote && (
-              <blockquote className="border-l-4 pl-4 italic text-gray-600 my-3">
-                {section.quote}
-              </blockquote>
-            )}
-            {section.cta && (
-              <div className="my-8">
-                <a href={section.cta.link} className="animated-button">
-                  <span className='label'>{section.cta.label}</span>
-                </a>
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
+
       {
-        blog.content.relatedLinks && (
-          <div className='px-4 space-y-2 pb-8'>
-            <h2 className='text-lg font-semibold'>Related Links:</h2>
-            {blog.content.relatedLinks.map((link, index) => (
-              <div key={index}>
-                <a href={link.url} target="_blank" rel="noopener noreferrer" className='text-(--accent-dark) underline'>{link.title}</a>
-                <p className='text-justify'>{link.description}</p>
-              </div>
-            ))}
+        blog.description && (
+          <div className="px-4 pb-8">
+            <h2 className="text-xl font-semibold mb-2">Description</h2>
+            <p className="text-justify whitespace-pre-line">{blog.description}</p>
           </div>
         )
       }
-      {
-        blog.content.tags && (
-          <div className='px-4 pb-8 flex items-center flex-wrap gap-2'>
-            <h2 className='text-lg font-semibold'>Tags:</h2>
-            {blog.content.tags.map((tag, index) => (
-              <span key={index} className='bg-(--accent-light) text-(--accent-dark) px-3 py-1 rounded-full text-sm'>{tag}</span>
-            ))}
-          </div>
-        )
-      }
-      <div className='px-4 pb-16 text-end text-gray-600'>
-        <Link to="/blogs" className='animated-button'><span className='label'>Back to Blogs</span></Link>
+
+      {blog.content && (
+        <div className="px-4 pb-8">
+          <ReactMarkdown
+            components={{
+              h1: ({ node, ...props }) => (
+                <h1 {...props} className="text-3xl font-bold mt-6 mb-4 text-gray-900" />
+              ),
+              h2: ({ node, ...props }) => (
+                <h2 {...props} className="text-2xl font-semibold mt-5 mb-3 text-gray-900" />
+              ),
+              h3: ({ node, ...props }) => (
+                <h3 {...props} className="text-xl font-semibold mt-4 mb-2 text-gray-900" />
+              ),
+              p: ({ node, ...props }) => (
+                <p {...props} className="text-base leading-relaxed text-gray-700 mb-4" />
+              ),
+              ul: ({ node, ...props }) => (
+                <ul {...props} className="list-disc list-inside text-gray-700 mb-4 ml-4" />
+              ),
+              ol: ({ node, ...props }) => (
+                <ol {...props} className="list-decimal list-inside text-gray-700 mb-4 ml-4" />
+              ),
+              li: ({ node, ...props }) => (
+                <li {...props} className="mb-1" />
+              ),
+              a: ({ node, ...props }) => (
+                <a
+                  {...props}
+                  className="text-blue-600 hover:text-blue-800 underline transition-colors"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                />
+              ),
+              blockquote: ({ node, ...props }) => (
+                <blockquote
+                  {...props}
+                  className="border-l-4 border-gray-300 pl-4 italic text-gray-600 my-4"
+                />
+              ),
+              code: ({ node, inline, ...props }) =>
+                inline ? (
+                  <code
+                    {...props}
+                    className="bg-gray-100 text-gray-800 px-1 py-0.5 rounded text-sm font-mono"
+                  />
+                ) : (
+                  <pre
+                    {...props}
+                    className="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto text-sm font-mono my-4"
+                  />
+                ),
+              img: ({ node, ...props }) => (
+                <img {...props} className="rounded-lg my-4 max-w-full mx-auto" alt="" />
+              ),
+              hr: ({ node, ...props }) => (
+                <hr {...props} className="my-6 border-gray-300" />
+              ),
+            }}
+          >
+            {blog.content}
+          </ReactMarkdown>
+
+        </div>
+      )}
+
+      <div className="px-4 pb-16 text-end text-gray-600">
+        <Link to="/blogs" className="animated-button">
+          <span className="label">Back to Blogs</span>
+        </Link>
       </div>
     </div>
   )

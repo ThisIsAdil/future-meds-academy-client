@@ -1,22 +1,32 @@
 import React, { useState, useEffect } from 'react'
+
 import { Users, BookOpen, GraduationCap, Globe, FileText, Mail, HelpCircle, Upload, Trash2, Plus, X } from 'lucide-react'
 import { dashboardService } from '../../services/dashboard'
 
 const Dashboard = () => {
     const [stats, setStats] = useState({
-        courses: 12,
-        imatUniversities: 25,
-        abroadUniversities: 18,
-        blogs: 47,
-        teamMembers: 8,
-        featuredImages: 5,
-        newsletters: 156,
-        questions: 342
+        courses: 0,
+        imatUniversities: 0,
+        abroadUniversities: 0,
+        blogs: 0,
+        teamMembers: 0,
+        featuredImages: 0,
+        newsletters: 0,
+        questions: 0
     })
 
     const [featuredImages, setFeaturedImages] = useState([])
     const [isUploading, setIsUploading] = useState(false)
     const maxImages = 5
+
+    const fetchStats = async () => {
+        try {
+            const { data } = await dashboardService.getStats()
+            setStats(data.data)
+        } catch (error) {
+            console.error('Error fetching stats:', error)
+        }
+    }
 
     const fetchFeaturedImages = async () => {
         try {
@@ -29,6 +39,7 @@ const Dashboard = () => {
 
     useEffect(() => {
         fetchFeaturedImages()
+        fetchStats()
     }, [])
 
     const contentStats = [
@@ -64,7 +75,6 @@ const Dashboard = () => {
             const response = (await dashboardService.uploadFeaturedImage(file)).data
             if (response.data) {
                 setFeaturedImages(prev => [...prev, response.data])
-                setStats(prev => ({ ...prev, featuredImages: prev.featuredImages + 1 }))
             }
             setIsUploading(false)
             e.target.value = '' // Reset file input
@@ -77,7 +87,6 @@ const Dashboard = () => {
             console.log('Delete response:', response)
             if (response.success) {
                 setFeaturedImages(prev => prev.filter(img => img._id !== imageId))
-                setStats(prev => ({ ...prev, featuredImages: prev.featuredImages - 1 }))
             }
         }
     }
@@ -98,7 +107,7 @@ const Dashboard = () => {
                     Dashboard
                 </h1>
                 <p className="text-sm text-gray-600">
-                    Welcome back! Here's an overview of your content management system.
+                    Welcome back Amir! Here's an overview of your content management system.
                 </p>
             </div>
 

@@ -1,4 +1,3 @@
-// ...existing code...
 import React, { useState, useEffect, useCallback } from 'react'
 import { Plus, Edit, Trash2, X, Upload, BookOpen, Clock, Euro, Users, ChevronDown, ChevronUp } from 'lucide-react'
 import AdminHeader from '../components/refactor/AdminHeader'
@@ -25,17 +24,21 @@ const CoursesManagement = () => {
         about: false, whyChoose: false, syllabus: true, faq: false
     })
     const [formData, setFormData] = useState(DEFAULT_FORM)
+    const [isLoading, setIsLoading] = useState(false) // added loading state
     const itemsPerPage = 10
 
     const fetchCourses = useCallback(async () => {
+        setIsLoading(true)
         try {
             const [coursesRes, teamRes] = await Promise.all([courseService.getAll(), teamService.getAll()])
             const coursesData = coursesRes?.data?.data || []
-            const teamData = (teamRes?.data?.data || []).map(m => ({ id: m._id || m.id, name: m.name }))
+            const teamData = (teamRes?.data?.data || []).map(m => ({ _id: m._id, name: m.name }))
             setCourses(coursesData)
             setAvailableInstructors(teamData)
         } catch (err) {
             console.error('Fetch error', err)
+        } finally {
+            setIsLoading(false)
         }
     }, [])
 
@@ -149,16 +152,17 @@ const CoursesManagement = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault()
+        setIsLoading(true)
         try {
             const payloadObj = buildPayload(formData)
 
             if (formData.thumbnail) {
                 const fd = toFormData({ ...payloadObj, thumbnail: formData.thumbnail })
                 // Ensure courseService does not force Content-Type for FormData requests.
-                if (editingCourse && editingCourse.id) {
+                if (editingCourse && editingCourse._id) {
                     await courseService.update(editingCourse._id, fd)
                     // optimistic update: merge non-file fields
-                    setCourses(prev => prev.map(c => c.id === editingCourse.id ? { ...c, ...payloadObj } : c))
+                    setCourses(prev => prev.map(c => c._id === editingCourse._id ? { ...c, ...payloadObj } : c))
                 } else {
                     const res = await courseService.create(fd)
                     const created = res?.data?.data || res?.data || payloadObj
@@ -177,27 +181,37 @@ const CoursesManagement = () => {
         } catch (err) {
             console.error('Save error', err)
         } finally {
+            setIsLoading(false)
             closeModal()
         }
     }
 
     const handleDelete = async (courseId) => {
         if (!window.confirm('Are you sure you want to delete this course?')) return
+        setIsLoading(true)
         try {
             await courseService.delete(courseId)
-            setCourses(prev => prev.filter(c => c.id !== courseId))
+            setCourses(prev => prev.filter(c => c._id !== courseId))
         } catch (err) {
-            setCourses(prev => prev.filter(c => c.id !== courseId))
+            setCourses(prev => prev.filter(c => c._id !== courseId))
+        } finally {
+            setIsLoading(false)
         }
     }
 
     const toggleSection = (key) => setExpandedSections(prev => ({ ...prev, [key]: !prev[key] }))
 
-    const getInstructorNames = (ids = []) =>
-        (ids || []).map(id => availableInstructors.find(i => String(i.id) === String(id))?.name || 'Unknown').join(', ')
-
     return (
-        <div className="max-w-6xl mx-auto space-y-6 bg-white">
+        <div className="max-w-6xl mx-auto space-y-6 bg-white relative">
+            {isLoading && (
+                <div className="absolute inset-0 z-50 flex items-center justify-center" aria-live="polite" aria-busy="true" role="status" style={{ backgroundColor: 'rgba(255,255,255,0.7)' }}>
+                    <div className="flex flex-col items-center gap-3">
+                        <div className="w-12 h-12 rounded-full border-4 border-t-transparent animate-spin" style={{ borderColor: 'var(--accent-dark) transparent transparent transparent' }} />
+                        <div className="text-sm" style={{ color: 'var(--accent-dark)' }}>Loading...</div>
+                    </div>
+                </div>
+            )}
+
             <AdminHeader title="Courses" count={filteredCourses.length} onAdd={openAddModal} addLabel="Add Course" addIcon={<Plus size={20} />} />
             <SearchInput value={searchTerm} onChange={setSearchTerm} placeholder="Search by course title or duration" />
 
@@ -247,7 +261,7 @@ const CoursesManagement = () => {
                                 <td className="py-4 px-6">
                                     <div className="flex gap-2">
                                         <button onClick={() => openEditModal(course)} className="p-2 rounded hover:bg-gray-100 transition-colors" style={{ color: 'var(--accent-dark)' }}><Edit size={16} /></button>
-                                        <button onClick={() => handleDelete(course.id)} className="p-2 rounded hover:bg-red-50 transition-colors text-red-600"><Trash2 size={16} /></button>
+                                        <button onClick={() => handleDelete(course._id)} className="p-2 rounded hover:bg-red-50 transition-colors text-red-600"><Trash2 size={16} /></button>
                                     </div>
                                 </td>
                             </tr>
@@ -331,12 +345,12 @@ const CoursesManagement = () => {
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium mb-3" style={{ color: 'var(--accent-dark)' }}>Instructors</label>
-                        <div className="grid grid-cols-2 gap-3 p-4 rounded-lg" style={{ backgroundColor: 'var(--accent-light)' }}>
+                        <label className="block text-sm font-medium mb-2" style={{ color: 'var(--accent-dark)' }}>Instructors</label>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-48 overflow-y-auto p-3 rounded-lg border" style={{ borderColor: 'var(--accent-light)', backgroundColor: 'var(--accent-light)' }}>
                             {availableInstructors.map(inst => (
-                                <label key={inst.id} className="flex items-center gap-2 cursor-pointer">
-                                    <input type="checkbox" checked={formData.instructors.includes(String(inst.id))} onChange={() => handleInstructorChange(String(inst.id))} className="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
-                                    <span className="text-sm" style={{ color: 'var(--accent-dark)' }}>{inst.name}</span>
+                                <label key={inst._id} className="flex items-center gap-2">
+                                    <input type="checkbox" checked={formData.instructors.includes(String(inst._id))} onChange={() => handleInstructorChange(String(inst._id))} className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" />
+                                    <span className="text-sm" style={{ color: 'var(--secondary)' }}>{inst.name}</span>
                                 </label>
                             ))}
                         </div>
@@ -380,8 +394,8 @@ const CoursesManagement = () => {
                     </div>
 
                     <div className="flex justify-end gap-3 pt-4 border-t" style={{ borderColor: 'var(--accent-light)' }}>
-                        <button type="button" onClick={closeModal} className="animated-button"><span className="label">Cancel</span></button>
-                        <button type="submit" className="animated-button"><span className="label">{editingCourse ? 'Update Course' : 'Save Course'}</span></button>
+                        <button type="button" onClick={closeModal} disabled={isLoading} className="animated-button"><span className="label">Cancel</span></button>
+                        <button type="submit" disabled={isLoading} className="animated-button"><span className="label">{editingCourse ? 'Update Course' : 'Save Course'}</span></button>
                     </div>
                 </form>
             </ModalWrapper>
@@ -399,4 +413,3 @@ const CoursesManagement = () => {
 }
 
 export default CoursesManagement
-// ...existing code...

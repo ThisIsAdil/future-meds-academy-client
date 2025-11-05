@@ -1,20 +1,82 @@
-// ...existing code...
-import React, { useMemo, useState } from "react";
-import IMAT_CUTOFFS from "../content/IMAT_CUTOFFS";
+import React, { useEffect, useMemo, useState } from "react";
+import { universityService } from "../services/university";
 
 const EuCutOff = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedYear, setSelectedYear] = useState("");
+    const [universities, setUniversities] = useState([]);
 
-    const years = useMemo(() => IMAT_CUTOFFS.map((y) => y.year).sort((a, b) => b - a), []);
+    const fetchUniversities = async () => {
+        try {
+            const response = await universityService.getAll();
+            const data = response?.data?.data ?? response?.data ?? response ?? []
+            setUniversities(Array.isArray(data) ? data : [])
+        } catch (error) {
+            console.error("Error fetching universities:", error);
+            setUniversities([])
+        }
+    }
 
-    const filteredYears = IMAT_CUTOFFS.filter((y) =>
-        selectedYear ? y.year.toString() === selectedYear : true
-    );
+    useEffect(() => {
+        fetchUniversities();
+    }, []);
+
+    // derive list of available years from universities.yearlyData
+    const availableYears = useMemo(() => {
+        const years = new Set();
+        universities.forEach(u => {
+            (u.yearlyData || []).forEach(y => {
+                if (typeof y?.year === 'number') years.add(y.year);
+            });
+        });
+        return Array.from(years).sort((a, b) => b - a);
+    }, [universities]);
+
+    // build data grouped by year for rendering
+    const groupedByYear = useMemo(() => {
+        const q = (searchTerm || '').trim().toLowerCase();
+        const yearsToRender = selectedYear ? [Number(selectedYear)] : availableYears;
+        return yearsToRender.map(year => {
+            const rows = universities
+                .map(u => {
+                    const yd = (u.yearlyData || []).find(d => Number(d.year) === Number(year));
+                    if (!yd) return null;
+                    // prepare eu/nonEu objects with safe defaults
+                    const eu = {
+                        seats: yd.eu?.seats ?? null,
+                        seatsLeft: yd.eu?.seatsLeft ?? null,
+                        cutOffRounds: Array.isArray(yd.eu?.cutOffRounds) ? yd.eu.cutOffRounds : (yd.eu?.cutOffRounds === undefined ? [] : []),
+                        finalCutOff: yd.eu?.finalCutOff ?? null
+                    };
+                    const nonEu = {
+                        seats: yd.nonEu?.seats ?? null,
+                        finalCutOff: yd.nonEu?.finalCutOff ?? null,
+                        rankingPdfUrl: yd.nonEu?.rankingPdfUrl ?? null
+                    };
+                    return {
+                        university: u,
+                        eu,
+                        nonEu
+                    };
+                })
+                .filter(Boolean)
+                .filter(r => {
+                    if (!q) return true;
+                    return (r.university?.name ?? '').toLowerCase().includes(q);
+                });
+
+            // compute max rounds for this year
+            const maxRounds = rows.reduce((max, r) => Math.max(max, (r.eu.cutOffRounds || []).length), 0);
+
+            return { year, rows, maxRounds };
+        }).filter(g => g.rows.length > 0);
+    }, [universities, availableYears, searchTerm, selectedYear]);
+
+    const formatValue = (v) => (v === null || v === undefined || v === '') ? '-' : v;
 
     return (
         <div className="max-w-6xl mx-auto p-4">
-            <h2 className="text-2xl font-semibold mb-4 text-(--accent-dark)">IMAT — EU Cutoffs</h2>
+            <h2 className="text-2xl font-semibold mb-4" style={{ color: 'var(--accent-dark)' }}>IMAT — EU Cutoffs</h2>
 
             <div className="flex gap-3 mb-4 flex-wrap">
                 <input
@@ -30,68 +92,73 @@ const EuCutOff = () => {
                     className="p-2 border border-[var(--accent-dark)] rounded-md"
                 >
                     <option value="">All years</option>
-                    {years.map((y) => (
-                        <option key={y} value={y}>
-                            {y}
-                        </option>
-                    ))}
+                    {availableYears.map(y => <option key={y} value={y}>{y}</option>)}
                 </select>
             </div>
 
             <div className="space-y-6">
-                {filteredYears.map((yearData) => {
-                    const maxRounds = Math.max(
-                        0,
-                        ...yearData.universities.map((u) => (u.eu.rounds ? u.eu.rounds.length : 0))
-                    );
+                {groupedByYear.length === 0 && (
+                    <div className="p-6 text-center text-sm text-gray-500">No cutoffs found</div>
+                )}
 
-                    const visibleUniversities = yearData.universities.filter((u) =>
-                        u.name.toLowerCase().includes(searchTerm.toLowerCase())
-                    );
+                {groupedByYear.map(group => (
+                    <section key={group.year} className="bg-[var(--accent-light)] p-4 rounded-md">
+                        <h3 className="text-xl font-medium mb-3">{group.year} — EU Cutoffs</h3>
 
-                    if (visibleUniversities.length === 0) return null;
+                        <div className="overflow-x-auto">
+                            <table className="min-w-full border-collapse">
+                                <thead>
+                                    <tr className="bg-white">
+                                        <th className="border p-2 text-left">University</th>
+                                        <th className="border p-2 text-center">EU Seats</th>
+                                        <th className="border p-2 text-center">EU Final Cutoff</th>
+                                        <th className="border p-2 text-center">EU Seats Left</th>
 
-                    return (
-                        <section key={yearData.year} className="bg-(--accent-light) p-4 rounded-md">
-                            <h3 className="text-xl font-medium mb-3">{yearData.year} — EU Cutoffs</h3>
+                                        {Array.from({ length: group.maxRounds }).map((_, i) => (
+                                            <th key={i} className="border p-2 text-center">Round {i + 1}</th>
+                                        ))}
 
-                            <div className="overflow-x-auto">
-                                <table className="min-w-full border-collapse">
-                                    <thead>
-                                        <tr className="bg-white">
-                                            <th className="border p-2 text-left">University</th>
-                                            <th className="border p-2 text-center">Seats (EU)</th>
-                                            <th className="border p-2 text-center">Final Cutoff</th>
-                                            <th className="border p-2 text-center">Seats Left</th>
-                                            {Array.from({ length: maxRounds }).map((_, i) => (
-                                                <th key={i} className="border p-2 text-center">
-                                                    Round {i + 1}
-                                                </th>
-                                            ))}
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {visibleUniversities.map((u) => (
-                                            <tr key={u.code} className="odd:bg-white even:bg-(--primary)">
+                                        <th className="border p-2 text-center">Non-EU Seats</th>
+                                        <th className="border p-2 text-center">Non-EU Final Cutoff</th>
+                                        <th className="border p-2 text-center">Ranking PDF</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {group.rows.map((r, idx) => {
+                                        const u = r.university;
+                                        const eu = r.eu;
+                                        const nonEu = r.nonEu;
+                                        const rowKey = `${u.name}-${group.year}-${idx}`;
+                                        return (
+                                            <tr key={rowKey} className="odd:bg-white even:bg-[var(--primary)]">
                                                 <td className="border p-2">{u.name}</td>
-                                                <td className="border p-2 text-center">{u.eu.seats}</td>
-                                                <td className="border p-2 text-center">{u.eu.finalCutoff}</td>
-                                                <td className="border p-2 text-center">
-                                                    {u.eu.seatsLeft !== null ? u.eu.seatsLeft : "N/A"}
-                                                </td>
-                                                {Array.from({ length: maxRounds }).map((_, i) => (
+                                                <td className="border p-2 text-center">{formatValue(eu.seats)}</td>
+                                                <td className="border p-2 text-center">{formatValue(eu.finalCutOff)}</td>
+                                                <td className="border p-2 text-center">{formatValue(eu.seatsLeft)}</td>
+
+                                                {Array.from({ length: group.maxRounds }).map((_, i) => (
                                                     <td key={i} className="border p-2 text-center">
-                                                        {u.eu.rounds && u.eu.rounds[i] !== undefined ? u.eu.rounds[i] : "-"}
+                                                        {eu.cutOffRounds && eu.cutOffRounds[i] !== undefined ? formatValue(eu.cutOffRounds[i]) : '-'}
                                                     </td>
                                                 ))}
+
+                                                <td className="border p-2 text-center">{formatValue(nonEu.seats)}</td>
+                                                <td className="border p-2 text-center">{formatValue(nonEu.finalCutOff)}</td>
+                                                <td className="border p-2 text-center">
+                                                    {nonEu.rankingPdfUrl ? (
+                                                        <a href={nonEu.rankingPdfUrl} target="_blank" rel="noreferrer" className="text-blue-600 underline">
+                                                            View PDF
+                                                        </a>
+                                                    ) : '-'}
+                                                </td>
                                             </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </section>
-                    );
-                })}
+                                        )
+                                    })}
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+                ))}
             </div>
         </div>
     );

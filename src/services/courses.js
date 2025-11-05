@@ -5,5 +5,5 @@ export const courseService = {
     create: (data) => axiosClient.post("/courses/create", data),
     getById: (id) => axiosClient.get(`/courses/${id}`),
     update: (id, data) => axiosClient.put(`/courses/edit/${id}`, data),
-    delete: (id) => axiosClient.delete(`/courses/${id}`),
+    delete: (id) => axiosClient.delete(`/courses/delete/${id}`),
 };

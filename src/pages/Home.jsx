@@ -1,55 +1,34 @@
 import HeroSection from "../sections/home/HeroSection"
 import Courses from "../sections/home/Courses"
-import ImpactAndResult from "../sections/home/ImpactAndResult"
+// import ImpactAndResult from "../sections/home/ImpactAndResult"
 import Team from "../sections/home/Team"
 import Testimonial from "../sections/home/Testimonial"
 import { Banner } from "../components"
 
 import { MapPin } from "lucide-react"
 import { Link } from "react-router-dom"
+import { useEffect, useState } from "react"
 
-// Top Performers from Future MedsAcademy
-// 	•	Ali Naqi (New Delhi, India) – Rank 1 at the University of Pavia and Rank 5 overall globally with an impressive score of 84.7.
-// Ali’s dedication and strategic preparation throughout the course reflect the quality of mentorship and structured training offered at Future MedsAcademy.
-// 	•	Farhat Ullah Khan (Kashmir, India) – Rank 1 at the University of Messina with a remarkable score of 79.
-// Farhat’s journey through our intensive mock exam series and personalized feedback sessions highlights how consistent practice leads to excellence.
-// 	•	External Candidate (with Srijit Prakash Patil) – Rank 1 at the University of Catania with a score of 82.8.
-// This student actively participated in 6–7 of our mock exams, demonstrating that even through partial engagement, the academy’s resources and evaluation methods significantly enhance performance.
-
+import { topPerformerService } from "../services/topPerformer"
 
 const Home = () => {
-  const topPerformers = [
-    {
-      image: "/assets/top-performers/ali-naqi.jpeg",
-      name: "Ali Naqi",
-      location: "New Delhi, India",
-      rank: 1,
-      globalRank: 5,
-      university: "University of Pavia",
-      score: 84.7,
-      description: "Ali’s dedication and strategic preparation throughout the course reflect the quality of mentorship and structured training offered at Future MedsAcademy."
-    },
-    {
-      image: "/assets/top-performers/farhat-ullah-khan.jpeg",
-      name: "Farhat Ullah Khan",
-      location: "Kashmir, India",
-      rank: 1,
-      globalRank: null,
-      university: "University of Messina",
-      score: 79,
-      description: "Farhat’s journey through our intensive mock exam series and personalized feedback sessions highlights how consistent practice leads to excellence."
-    },
-    {
-      image: null,
-      name: "Srijit Prakash Patil",
-      location: "Maharashtra, India",
-      rank: 1,
-      globalRank: null,
-      university: "University of Catania",
-      score: 82.8,
-      description: "This student actively participated in 6–7 of our mock exams, demonstrating that even through partial engagement, the academy’s resources and evaluation methods significantly enhance performance."
+  const [topPerformers, setTopPerformers] = useState([])
+  const [showAllPerformers, setShowAllPerformers] = useState(false)
+
+  const fetchTopPerformers = async () => {
+    try {
+      const response = await topPerformerService.getAll();
+      setTopPerformers(response.data.data);
+    } catch (error) {
+      console.error("Error fetching top performers:", error);
     }
-  ];
+  };
+
+  // Fetch top performers when the component mounts
+  useEffect(() => {
+    fetchTopPerformers();
+  }, []);
+
 
   const studyAbroadBannerContent = {
     title: "Study Medicine Abroad with Confidence",
@@ -57,6 +36,9 @@ const Home = () => {
     buttonText: "Explore Study Abroad Options",
     buttonLink: "/study-abroad"
   };
+
+  const displayedPerformers = showAllPerformers ? topPerformers : topPerformers.slice(0, 3)
+
   return (
     <div className="max-w-7xl mx-auto p-2">
       <HeroSection />
@@ -67,11 +49,11 @@ const Home = () => {
           We’re proud to share our students’ exceptional success in the IMAT 2025, securing top ranks including Rank 1 at the Universities of Messina and Pavia, a testament to our academy’s consistent excellence in medical admissions preparation.
         </p>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 max-w-5xl mx-auto mt-8">
-          {topPerformers.map((student, index) => (
+          {displayedPerformers.map((student, index) => (
             <div key={index} className="border border-gray-100 p-4 m-4 rounded-lg bg-white shadow-md hover:shadow-xl hover:scale-102 transition-transform">
               <p className="uppercase font-bold text-(--accent-dark) text-center mb-4">Rank {student.rank} <br /> at {student.university}</p>
               {student.image ? (
-                <img src={student.image} alt={student.name} className="w-full aspect-square object-cover rounded-md" />
+                <img src={student.image.url} alt={student.name} className="w-full aspect-square object-cover rounded-md" />
               ) : (
                 <div className="w-full aspect-square flex items-center justify-center bg-gray-200 rounded-md">
                   <span className="text-gray-500">Image Not Available</span>
@@ -80,19 +62,29 @@ const Home = () => {
               <span className="text-xs flex items-center gap-1 my-2"><MapPin color="#003b73" size={12} strokeWidth={1} /> {student.location}</span>
               <h3 className="text-xl font-semibold text-(--accent-dark)">{student.name}</h3>
               <p className="text-sm font-medium text-(--accent-dark)">Score: {student.score}</p>
-              {
-                student.globalRank &&
-                <p className="text-sm text-gray-500">Global Rank: {student.globalRank}</p>
-              }
-              <p className="mt-2 text-justify opacity-80">{student.description}</p>
+              <p className="mt-2 opacity-80">{student.description}</p>
             </div>
           ))}
         </div>
-        <button className="animated-button mt-8">
-          <Link to={"/consultation"} className="label">
-            Book a Free Consultation
+
+        <div className="flex flex-col sm:flex-row gap-3 items-center mt-8">
+          <Link to={"/consultation"} className="animated-button">
+            <button className="label">
+              Book a Free Consultation
+            </button>
           </Link>
-        </button>
+
+          {topPerformers.length > 3 && (
+            <button
+              onClick={() => setShowAllPerformers(prev => !prev)}
+              className="animated-button"
+            >
+              <span className="label">
+                {showAllPerformers ? "Show Less" : `Show ${topPerformers.length - 3} More`}
+              </span>
+            </button>
+          )}
+        </div>
       </div>
       <Courses />
       <Team />

@@ -1,12 +1,12 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { AtSign, BarChart3, BookOpen, Earth, FileQuestionMark, GraduationCap, Image, MessageSquare, Newspaper, PanelLeft, Quote, Trophy, Users } from 'lucide-react'
+import { AtSign, BarChart3, BookOpen, Earth, FileQuestionMark, GraduationCap, LayoutDashboard, MessageSquare, Newspaper, PanelLeft, Quote, Trophy, Users } from 'lucide-react'
 
 const sidebarContent = [
     {
-        label: "Featured Images",
+        label: "Dashboard",
         link: "/admin/",
-        icon: <Image className='h-full' />,
+        icon: <LayoutDashboard className='h-full' />,
     },
     {
         label: "Team Management",
@@ -34,8 +34,8 @@ const sidebarContent = [
         icon: <BarChart3 className='h-full' />,
     },
     {
-        label: "Top Scorers",
-        link: "/admin/top-scorers",
+        label: "Top Performers",
+        link: "/admin/top-Performers",
         icon: <Trophy className='h-full' />,
     },
     {

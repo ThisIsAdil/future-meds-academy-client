@@ -1,10 +1,9 @@
+import { BookOpen } from 'lucide-react'
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 
 
 const Universities = ({ title, universities }) => {
-
-
     const [search, setSearch] = useState('')
     const [location, setLocation] = useState('')
 
@@ -36,28 +35,42 @@ const Universities = ({ title, universities }) => {
                 )}
                 {filteredUniversities.map((university, index) => (
                     <div key={index} className="flex flex-wrap rounded-md bg-(--accent-light) overflow-hidden">
-                        <img src={university.thumbnail} alt={`${university.name} Campus`} className="flex-1 m-4 aspect-video rounded-xl min-w-[250px] w-full object-cover" />
+                        {
+                            university.campusImage.url ? <img src={university.campusImage.url} alt={`${university.name} Campus`} className="flex-1 m-4 aspect-video rounded-xl min-w-[250px] w-full object-cover" /> : <div className="flex-1 m-4 aspect-video rounded-xl min-w-[250px] w-full bg-gray-200 flex items-center justify-center">No Image Available</div>
+                        }
 
-                        <div className="flex-1 flex flex-col gap-4 justify-evenly items-start min-w-[250px] w-full p-4">
+                        <div className="flex-1 flex flex-col gap-4 justify-start items-start min-w-[250px] w-full p-4">
                             <div className='flex gap-4 items-center'>
-                                <img src={university.logo} alt={`${university.name} Logo`} className="h-16" />
+                                {
+                                    university.logo.url ? <img src={university.logo.url} alt={`${university.name} Logo`} className="h-16" /> : <div className="h-16 w-16 bg-gray-200 flex items-center justify-center rounded-md">No Logo</div>
+                                }
+
                                 <div>
                                     <h3 className="text-xl font-semibold text-(--accent-dark)">{university.name}</h3>
                                     <p className="font-light">{university.location}</p>
                                 </div>
                             </div>
                             <div className='p-4 space-y-2'>
-                                <p className='space-x-2'>
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="size-4 inline">
-                                        <path d="M7.702 1.368a.75.75 0 0 1 .597 0c2.098.91 4.105 1.99 6.004 3.223a.75.75 0 0 1-.194 1.348A34.27 34.27 0 0 0 8.341 8.25a.75.75 0 0 1-.682 0c-.625-.32-1.262-.62-1.909-.901v-.542a36.878 36.878 0 0 1 2.568-1.33.75.75 0 0 0-.636-1.357 38.39 38.39 0 0 0-3.06 1.605.75.75 0 0 0-.372.648v.365c-.773-.294-1.56-.56-2.359-.8a.75.75 0 0 1-.194-1.347 40.901 40.901 0 0 1 6.005-3.223ZM4.25 8.348c-.53-.212-1.067-.411-1.611-.596a40.973 40.973 0 0 0-.418 2.97.75.75 0 0 0 .474.776c.175.068.35.138.524.21a5.544 5.544 0 0 1-.58.681.75.75 0 1 0 1.06 1.06c.35-.349.655-.726.915-1.124a29.282 29.282 0 0 0-1.395-.617A5.483 5.483 0 0 0 4.25 8.5v-.152Z" />
-                                        <path d="M7.603 13.96c-.96-.6-1.958-1.147-2.989-1.635a6.981 6.981 0 0 0 1.12-3.341c.419.192.834.393 1.244.602a2.25 2.25 0 0 0 2.045 0 32.787 32.787 0 0 1 4.338-1.834c.175.978.315 1.969.419 2.97a.75.75 0 0 1-.474.776 29.385 29.385 0 0 0-4.909 2.461.75.75 0 0 1-.794 0Z" />
-                                    </svg>
-                                    {
-                                        university.seatsInfo.map((info, idx) => (
-                                            <span key={idx} className='font-medium'>{info.category} Seats: <span className='font-normal'>{info.seats}</span></span>
-                                        ))
-                                    }
-                                </p>
+                                {
+                                    university.programs &&
+                                    <p className='space-x-2'>
+                                        <BookOpen className="size-4 inline" />
+                                        <span>
+                                            <span className='font-medium'>Programs:</span> {university.programs.join(', ')}
+                                        </span>
+                                    </p>
+                                }
+                                {
+                                    university.yearlyData && university.yearlyData.filter(yd => yd.year === 2025).map((info, idx) => (
+                                        <p className='space-x-2' key={idx}>
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="size-4 inline">
+                                                <path d="M7.702 1.368a.75.75 0 0 1 .597 0c2.098.91 4.105 1.99 6.004 3.223a.75.75 0 0 1-.194 1.348A34.27 34.27 0 0 0 8.341 8.25a.75.75 0 0 1-.682 0c-.625-.32-1.262-.62-1.909-.901v-.542a36.878 36.878 0 0 1 2.568-1.33.75.75 0 0 0-.636-1.357 38.39 38.39 0 0 0-3.06 1.605.75.75 0 0 0-.372.648v.365c-.773-.294-1.56-.56-2.359-.8a.75.75 0 0 1-.194-1.347 40.901 40.901 0 0 1 6.005-3.223ZM4.25 8.348c-.53-.212-1.067-.411-1.611-.596a40.973 40.973 0 0 0-.418 2.97.75.75 0 0 0 .474.776c.175.068.35.138.524.21a5.544 5.544 0 0 1-.58.681.75.75 0 1 0 1.06 1.06c.35-.349.655-.726.915-1.124a29.282 29.282 0 0 0-1.395-.617A5.483 5.483 0 0 0 4.25 8.5v-.152Z" />
+                                                <path d="M7.603 13.96c-.96-.6-1.958-1.147-2.989-1.635a6.981 6.981 0 0 0 1.12-3.341c.419.192.834.393 1.244.602a2.25 2.25 0 0 0 2.045 0 32.787 32.787 0 0 1 4.338-1.834c.175.978.315 1.969.419 2.97a.75.75 0 0 1-.474.776 29.385 29.385 0 0 0-4.909 2.461.75.75 0 0 1-.794 0Z" />
+                                            </svg>
+                                            <span className='font-medium'>Seats: Eu: <span className='font-normal'>{info.eu.seats}</span> | Non-Eu: <span className='font-normal'>{info.nonEu.seats}</span></span>
+                                        </p>
+                                    ))
+                                }
                                 <p className='space-x-2'>
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="size-4 inline">
                                         <path fillRule="evenodd" d="M15 8A7 7 0 1 1 1 8a7 7 0 0 1 14 0ZM6.875 6c.09-.22.195-.42.31-.598.413-.638.895-.902 1.315-.902.264 0 .54.1.814.325a.75.75 0 1 0 .953-1.158C9.772 3.259 9.169 3 8.5 3c-1.099 0-1.992.687-2.574 1.587A5.518 5.518 0 0 0 5.285 6H4.75a.75.75 0 0 0 0 1.5h.267a7.372 7.372 0 0 0 0 1H4.75a.75.75 0 0 0 0 1.5h.535c.156.52.372.998.64 1.413C6.509 12.313 7.402 13 8.5 13c.669 0 1.272-.26 1.767-.667a.75.75 0 0 0-.953-1.158c-.275.226-.55.325-.814.325-.42 0-.902-.264-1.315-.902a3.722 3.722 0 0 1-.31-.598H8.25a.75.75 0 0 0 0-1.5H6.521a5.854 5.854 0 0 1 0-1H8.25a.75.75 0 0 0 0-1.5H6.875Z" clipRule="evenodd" />
@@ -72,12 +85,26 @@ const Universities = ({ title, universities }) => {
                                     <span className='font-medium'>Program Length: </span>
                                     {university.programLength}
                                 </p>
+                                {
+                                    university.admissionInfo && (
+                                        <p className='space-x-2'>
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="size-4 inline">
+                                                <path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1Zm0 13A6 6 0 1 1 8 2a6 6 0 0 1 0 12Z" />
+                                                <path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.52-1.206 1.194-1.168 2.007l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.48-1.2 1.173-1.763.609-.492 1.244-1.127 1.244-2.227 0-1.511-1.276-2.241-2.673-2.241-1.584 0-2.584 1.066-2.67 2.415ZM8 11.5a1 1 0 1 0 0 2 1 1 0 0 0 0-2Z" />
+                                            </svg>
+                                            <span className='font-medium'>Admission Info: </span>
+                                            {university.admissionInfo}
+                                        </p>
+                                    )
+                                }
                             </div>
-                            <Link to={university.ctaLink} className='animated-button'>
-                                <span className='label'>
-                                    {university.cta}
-                                </span>
-                            </Link>
+                            {university.blogUrl && (
+                                <Link to={university.blogUrl} className='animated-button'>
+                                    <span className='label'>
+                                        View Details
+                                    </span>
+                                </Link>
+                            )}
                         </div>
                     </div>
                 ))}

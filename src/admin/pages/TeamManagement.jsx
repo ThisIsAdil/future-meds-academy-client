@@ -137,7 +137,7 @@ const TeamManagement = () => {
         if (previewUrl) {
             URL.revokeObjectURL(previewUrl)
         }
-        setPreviewUrl(member?.profilePicture || null)
+        setPreviewUrl(member?.profilePicture.url || null)
     }
     const closeModal = () => {
         setIsModalOpen(false)

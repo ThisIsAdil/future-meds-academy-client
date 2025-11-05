@@ -1,12 +1,40 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom'
+import axiosClient from '../api/axiosClient';
 const Footer = () => {
+  const [email, setEmail] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [response, setResponse] = useState(null)
+
+  const handleSubscribe = async (e) => {
+    e.preventDefault()
+    if (response) {
+      setResponse("Response is Already Submitted")
+      return
+    }
+    setLoading(true)
+    try {
+      const response = await axiosClient.post('/newsletter/subscribe', { email })
+
+      setResponse(response.data.message)
+
+    } catch (error) {
+      setResponse(error.response.data.message)
+    } finally {
+      setEmail('')
+      setLoading(false)
+    }
+
+
+  }
+
   const links = [
     {
       title: "Future MedsAcademy", links: [
         { name: "Home", path: "/" },
         { name: "About Us", path: "/about" },
         { name: "Courses", path: "/courses" },
-        { name: "Blog", path: "/blog" },
+        { name: "Blogs", path: "/blogs" },
       ]
     },
     {
@@ -52,13 +80,14 @@ const Footer = () => {
         <div className='flex-1 min-w-[250px]'>
           <h4 className='text-(--accent-dark) font-bold text-lg mb-2'>Subscribe</h4>
           <p className='text-sm'>Stay informed about our newest courses and features — subscribe today!</p>
-          <form onSubmit={(e) => e.preventDefault()} className='flex flex-row items-center flex-wrap max-w-lg gap-1 my-4'>
-            <input type="email" required placeholder="Enter your email" className='w-full max-w-xs my-2 p-2 border border-[--accent-dark]' />
-            <button type="submit" className="animated-button">
+          <form onSubmit={(e) => handleSubscribe(e)} className='flex flex-row items-center flex-wrap max-w-lg gap-1 my-4'>
+            <input type="email" required placeholder="Enter your email" value={email} onChange={(e) => setEmail(e.target.value)} className='w-full max-w-xs my-2 p-2 border border-[--accent-dark]' />
+            <button type="submit" className="animated-button" disabled={loading}>
               <span className="label">Subscribe</span>
             </button>
           </form>
-          <p className='text-sm text-(--accent-dark)'>By subscribing, you agree to our <Link to="/terms" className="animated-link">Terms of Service</Link> and <Link to="/privacy" className="animated-link">Privacy Policy</Link>.</p>
+          {response && <span className='text-xs mb-4 text-green-600'>{response}</span>}
+          <p className='text-sm text-(--accent-dark)'>By subscribing, you agree to our <Link to="/terms" className="animated-link">Terms of Service</Link> and <Link to="/privacy-policy" className="animated-link">Privacy Policy</Link>.</p>
         </div>
       </div>
       <div className='flex flex-wrap gap-1 mb-8 px-4 max-w-7xl mx-auto'>
@@ -86,7 +115,7 @@ const Footer = () => {
           <Link to="/terms" className="animated-link text-sm">
             Terms of Service
           </Link>
-          <a href="https://adilshaikh.dev" target='_blank' rel="noopener noreferrer" className="animated-link text-sm">
+          <a href="https://adilshaikh.me" target='_blank' rel="noopener noreferrer" className="animated-link text-sm">
             Developed by Adil Shaikh
           </a>
         </div>

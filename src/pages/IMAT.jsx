@@ -120,7 +120,7 @@ const IMAT = () => {
                 <h1 className='text-3xl font-bold text-(--accent-dark)'>Everything You Need to Know About the IMAT {examinationYear} Examination</h1>
                 <p>Your complete guide to the International Medical Admissions Test (IMAT) — exam details, preparation strategies, <Link to="/past-papers" className='animated-link'>past papers</Link>, and <Link to="/consultation" className='animated-link'>expert mentorship</Link> with <Link to="/courses" className='animated-link'>Future MedsAcademy</Link>.</p>
                 <div className='flex flex-col sm:flex-row gap-4 mt-4'>
-                    <Link to="/past-papers"><button className='animated-button'><span className='label'>Access IMAT Past Year Questions</span></button></Link>
+                    <Link to="/previous-year-papers"><button className='animated-button'><span className='label'>Access IMAT Past Year Questions</span></button></Link>
                     <Link to="/courses"><button className='animated-button'><span className='label'>Explore IMAT Prep Courses</span></button></Link>
                 </div>
             </div>

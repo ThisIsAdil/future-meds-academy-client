@@ -1,47 +1,26 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
+import axiosClient from '../../api/axiosClient'
 
-const subscribers = [
-    // ...existing code...
-    { email: "example@example.com", date: "2023-01-01" },
-    { email: "user@example.com", date: "2023-01-02" },
-    { email: "admin@example.com", date: "2023-01-03" },
-    { email: "newuser@example.com", date: "2023-01-04" },
-    { email: "john.doe@email.com", date: "2023-01-05" },
-    { email: "jane.smith@email.com", date: "2023-01-06" },
-    { email: "michael.johnson@email.com", date: "2023-01-07" },
-    { email: "sarah.williams@email.com", date: "2023-01-08" },
-    { email: "david.brown@email.com", date: "2023-01-09" },
-    { email: "emily.davis@email.com", date: "2023-01-10" },
-    { email: "chris.miller@email.com", date: "2023-01-11" },
-    { email: "lisa.wilson@email.com", date: "2023-01-12" },
-    { email: "robert.moore@email.com", date: "2023-01-13" },
-    { email: "amanda.taylor@email.com", date: "2023-01-14" },
-    { email: "kevin.anderson@email.com", date: "2023-01-15" },
-    { email: "michelle.thomas@email.com", date: "2023-01-16" },
-    { email: "james.jackson@email.com", date: "2023-01-17" },
-    { email: "jennifer.white@email.com", date: "2023-01-18" },
-    { email: "brian.harris@email.com", date: "2023-01-19" },
-    { email: "nicole.martin@email.com", date: "2023-01-20" },
-    { email: "daniel.thompson@email.com", date: "2023-01-21" },
-    { email: "stephanie.garcia@email.com", date: "2023-01-22" },
-    { email: "matthew.martinez@email.com", date: "2023-01-23" },
-    { email: "lauren.robinson@email.com", date: "2023-01-24" },
-    { email: "andrew.clark@email.com", date: "2023-01-25" },
-    { email: "jessica.rodriguez@email.com", date: "2023-01-26" },
-    { email: "joshua.lewis@email.com", date: "2023-01-27" },
-    { email: "ashley.lee@email.com", date: "2023-01-28" },
-    { email: "ryan.walker@email.com", date: "2023-01-29" },
-    { email: "megan.hall@email.com", date: "2023-01-30" },
-    { email: "tyler.allen@email.com", date: "2023-01-31" },
-    { email: "hannah.young@email.com", date: "2023-02-01" },
-    { email: "brandon.hernandez@email.com", date: "2023-02-02" },
-    { email: "samantha.king@email.com", date: "2023-02-03" }
-]
 
 const NewsLetter = () => {
     const [search, setSearch] = useState("")
     const [currentPage, setCurrentPage] = useState(1)
     const rowsPerPage = 10
+    const [subscribers, setSubscribers] = useState([])
+
+    const fetchSubscribers = async () => {
+        try {
+            const response = await axiosClient.get('/newsletter');
+
+            setSubscribers(response?.data?.data)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    useEffect(() => {
+        fetchSubscribers()
+    }, [])
 
     // Filter subscribers based on search
     const filteredSubscribers = subscribers.filter(subscriber =>
@@ -65,6 +44,31 @@ const NewsLetter = () => {
         setCurrentPage(1)
     }
 
+    // CSV helpers
+    function toCsv(rows = []) {
+        if (!rows.length) return ''
+        const keys = Object.keys(rows[0])
+        const escape = (v) => `"${String(v ?? '').replace(/"/g, '""').replace(/\n/g, ' ')}"`
+        return [keys.join(','), ...rows.map((r) => keys.map((k) => escape(r[k])).join(','))].join('\n')
+    }
+
+    function exportCsv() {
+        const rows = filteredSubscribers.map((s, idx) => ({
+            no: idx + 1,
+            email: s.email || '',
+            date: s.date || ''
+        }))
+        const csv = toCsv(rows)
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        const now = new Date().toISOString().slice(0, 19).replace(/[:T]/g, '_')
+        a.download = `newsletter_subscribers_${now}.csv`
+        a.click()
+        URL.revokeObjectURL(url)
+    }
+
     return (
         <div className='max-w-4xl mx-auto space-y-6'>
             <div className='mb-8'>
@@ -72,16 +76,26 @@ const NewsLetter = () => {
                 <p className='text-sm text-gray-600'>{filteredSubscribers.length} subscribers</p>
             </div>
 
-            {/* Search */}
+            {/* Search and actions */}
+            <div className='flex flex-col md:flex-row md:items-center md:justify-between gap-4'>
+                <input
+                    type="text"
+                    placeholder='Search by email'
+                    className='w-full max-w-md py-3 px-4 bg-(--accent-light) rounded-lg border-0 focus:outline-none focus:ring-2 focus:ring-(--accent-light)'
+                    value={search}
+                    onChange={handleSearchChange}
+                />
 
-            <input
-                type="text"
-                placeholder='Search by email'
-                className='w-full max-w-md py-3 px-4 bg-(--accent-light) rounded-lg border-0 focus:outline-none focus:ring-2 focus:ring-(--accent-light)'
-                value={search}
-                onChange={handleSearchChange}
-            />
-
+                <div className='flex items-center gap-3'>
+                    <button
+                        onClick={exportCsv}
+                        className='animated-button px-3 py-2'
+                        aria-label='Export subscribers CSV'
+                    >
+                        Export CSV
+                    </button>
+                </div>
+            </div>
 
             {/* Table */}
             <div className='bg-white rounded-lg overflow-scroll shadow-sm border border-(--accent-light)'>
@@ -98,7 +112,7 @@ const NewsLetter = () => {
                             <tr key={startIndex + index} className='hover:bg-gray-50 transition-colors duration-150'>
                                 <td className='py-4 px-6 text-sm text-gray-500'>{startIndex + index + 1}</td>
                                 <td className='py-4 px-6 text-sm text-gray-900'>{subscriber.email}</td>
-                                <td className='py-4 px-6 text-sm text-gray-500'>{subscriber.date}</td>
+                                <td className='py-4 px-6 text-sm text-gray-500'>{new Date(subscriber.date).toLocaleDateString()}</td>
                             </tr>
                         ))}
                     </tbody>

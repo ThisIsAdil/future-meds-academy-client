@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom"
 
 import Admin from "./routes/Admin";
 import Public from "./routes/Public";
+import Auth from "./routes/Auth";
 
 
 const App = () => {
@@ -20,6 +21,7 @@ const App = () => {
     <BrowserRouter>
       <ScrollToTop />
       <Routes>
+        <Route path="/auth" element={<Auth />} />
         <Route path="/*" element={<Public />} />
         <Route path="/admin/*" element={<Admin />} />
       </Routes>
