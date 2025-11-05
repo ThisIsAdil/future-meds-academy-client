@@ -50,7 +50,7 @@ const Footer = () => {
   const socials = [
     { name: "Instagram", url: "https://www.instagram.com/futuremedsacademy/" },
     { name: "YouTube", url: "https://www.youtube.com/@theguyinwhitecoat" },
-    { name: "WhatsApp", url: "https://chat.whatsapp.com/KqeGz58KHTJ1NfrnT5WkeX" },
+    { name: "WhatsApp", url: `https://wa.me/${import.meta.env.VITE_WHATSAPP_NUMBER}` },
     { name: "Telegram", url: "https://t.me/imat2025fma" },
   ]
 
