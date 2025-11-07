@@ -52,7 +52,7 @@ const About = () => {
                     </ul>
                 </div>
                 <div className='flex-1 min-w-xs max-w-md'>
-                    <img className='object-cover w-full rounded-xl' src="/assets/team/amir-akhtar.jpg" alt="Amir Akhtar" />
+                    <img className='object-cover w-full rounded-xl' src="/assets/amir-akhtar.jpg" alt="Amir Akhtar" />
                 </div>
             </div>
             <div className='px-8 py-16 lg:my-8 bg-(--accent-light) flex items-center justify-center flex-wrap gap-8'>
@@ -86,7 +86,7 @@ const About = () => {
                 <p>
                     We exist because students deserve clear, structured, and accurate support for IMAT preparation and studying medicine in Italy.
                 </p>
-                <p className='mb-8'> 
+                <p className='mb-8'>
                     No more overpriced consultancies, confusing processes, or misleading promises — just transparent guidance, practical resources, and a supportive community built by someone who has faced the same challenges.
                 </p>
                 <Link to="/courses" className='animated-button'>

@@ -73,7 +73,7 @@ const CourseSyllabus = () => {
                 <h2 className='text-lg font-semibold mb-1'>Instructor</h2>
                 <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8'>
                     {course.instructors && course.instructors.map((inst, index) => (
-                        <Link to={`/team/${inst.name.replace(/\s+/g, '-').toLowerCase()}`} key={index} className='flex flex-col flex-wrap text-center gap-4 mb-4 items-center bg-(--accent-light) p-4 rounded-md'>
+                        <Link to={`/team/${inst._id}`} key={index} className='flex flex-col flex-wrap text-center gap-4 mb-4 items-center bg-(--accent-light) p-4 rounded-md'>
                             {
                                 inst.profilePicture?.url ? (
                                     <img src={inst.profilePicture.url} alt={inst.name} className='w-24 h-24 object-cover rounded-full' />

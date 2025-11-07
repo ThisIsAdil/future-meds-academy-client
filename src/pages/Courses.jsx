@@ -41,7 +41,7 @@ const Courses = () => {
             </div>
             <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8 bg-(--accent-light) p-4 w-full rounded-md'>
                 {filteredCourses.map((course, index) => (
-                    <div key={index} className='flex flex-col items-center space-y-4 flex-wrap-reverse border border-gray-200 rounded-md p-4 bg-(--primary)'>
+                    <div key={index} className='flex flex-col items-center justify-start space-y-4 flex-wrap-reverse border border-gray-200 rounded-md p-4 bg-(--primary)'>
                         <h2 className='text-2xl font-bold text-[var(--accent-dark)] text-center'>{course.title}</h2>
                         {
                             course.thumbnail?.url ? (
