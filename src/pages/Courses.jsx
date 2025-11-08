@@ -41,7 +41,7 @@ const Courses = () => {
             </div>
             <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8 bg-(--accent-light) p-4 w-full rounded-md'>
                 {filteredCourses.map((course, index) => (
-                    <div key={index} className='flex flex-col items-center justify-start space-y-4 flex-wrap-reverse border border-gray-200 rounded-md p-4 bg-(--primary)'>
+                    <div key={index} className='flex flex-col items-center space-y-4 flex-wrap-reverse border border-gray-200 rounded-md p-4 bg-(--primary)'>
                         <h2 className='text-2xl font-bold text-[var(--accent-dark)] text-center'>{course.title}</h2>
                         {
                             course.thumbnail?.url ? (
@@ -52,7 +52,7 @@ const Courses = () => {
                                 </div>
                             )
                         }
-                        <div className='flex flex-col gap-4 justify-between flex-1'>
+                        <div className='flex flex-col gap-4 justify-start flex-1'>
                             <p>{course.shortDescription}</p>
                             <h3 className='font-semibold'>Why Choose This Course?</h3>
                             <ul>
@@ -60,18 +60,18 @@ const Courses = () => {
                                     <li key={idx}><span className='text-green-500 mr-2 mt-0.5'>✓</span> {point}</li>
                                 ))}
                             </ul>
-                            <div className='grid grid-cols-1 md:grid-cols-2 gap-4 mt-4'>
-                                <Link to={`/courses/syllabus/${course._id}`}>
-                                    <button className='animated-button w-full'>
-                                        <span className='label'>View Course Details</span>
-                                    </button>
-                                </Link>
-                                <a href={`https://wa.me/${import.meta.env.VITE_WHATSAPP_NUMBER}?text=${encodeURIComponent(`Hello, I want to enroll in ${course.title} now!`)}`} target="_blank" rel="noopener noreferrer">
-                                    <button className='animated-button w-full'>
-                                        <span className='label'>Enroll Now via WhatsApp</span>
-                                    </button>
-                                </a>
-                            </div>
+                        </div>
+                        <div className='grid grid-cols-1 md:grid-cols-2 gap-4 mt-4'>
+                            <Link to={`/courses/syllabus/${course._id}`}>
+                                <button className='animated-button w-full'>
+                                    <span className='label'>View Course Details</span>
+                                </button>
+                            </Link>
+                            <a href={`https://wa.me/${import.meta.env.VITE_WHATSAPP_NUMBER}?text=${encodeURIComponent(`Hello, I want to enroll in ${course.title} now!`)}`} target="_blank" rel="noopener noreferrer">
+                                <button className='animated-button w-full'>
+                                    <span className='label'>Enroll Now via WhatsApp</span>
+                                </button>
+                            </a>
                         </div>
                     </div>
                 ))}

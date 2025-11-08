@@ -76,7 +76,7 @@ const Testimonial = () => {
                 ref={containerRef}
             >
                 {testimonials.map((testimonial, index) => (
-                    <div key={index} className="px-4 mx-auto snap-start min-w-[300px] max-w-sm">
+                    <div key={index} className="px-4 mx-auto snap-start min-w-lg max-w-[80vw]">
                         <div className='rounded shadow-lg p-4 w-full h-full bg-(--primary) flex flex-col justify-between'>
                             <div className='flex items-center gap-2 mb-4 bg-(--accent-dark) p-2 pl-4 rounded-tl-full rounded-bl-full rounded ml-auto w-fit'>
                                 {renderStars(testimonial.stars)}

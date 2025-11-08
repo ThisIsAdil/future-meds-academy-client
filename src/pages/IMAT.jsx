@@ -107,7 +107,7 @@ const IMAT = () => {
         },
         {
             question: "What subjects are covered in the IMAT exam?",
-            answer: "The IMAT exam covers five main sections: Biology (18 questions), Chemistry (12 questions), Physics and Mathematics (10 questions), Logical Reasoning and General Knowledge (20 questions)."
+            answer: "The IMAT exam covers five main sections: Biology (23 questions), Chemistry (15 questions), Physics and Mathematics (13 questions), Logical Reasoning and General Knowledge (9 questions)."
         }
     ]
 

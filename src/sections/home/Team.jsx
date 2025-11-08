@@ -24,9 +24,9 @@ const Team = () => {
             <div className='max-w-6xl mx-auto'>
                 <h2 className='text-3xl font-semibold text-center text-(--accent-dark) mb-12'>Meet Our Team</h2>
 
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-6 justify-items-center">
+                <div className="flex overflow-x-auto gap-8 px-4 snap-x">
                     {teamMembers.map((member, index) => (
-                        <Link to={`/team/${member._id}`} className='text-center max-w-[160px] bg-(--accent-light) rounded-lg p-2 hover:shadow-md transition-shadow duration-300' key={index}>
+                        <Link to={`/team/${member._id}`} className='text-center max-w-md min-w-[160px] snap-start bg-(--accent-light) rounded-lg p-2 hover:shadow-md transition-shadow duration-300' key={index}>
                             <div className='mb-4 overflow-hidden rounded-md'>
                                 <SmartImage
                                     src={member.profilePicture.url}

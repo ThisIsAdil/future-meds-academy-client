@@ -36,7 +36,7 @@ const Courses = () => {
                 <div className='grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto'>
                     {courses.map((course, index) => (
                         <div key={course._id} className={`relative bg-(--accent-dark) text-(--accent-light) p-8 rounded-lg`}>
-                            {index === 0 && (
+                            {index === 1 && (
                                 <div className='absolute -top-3 left-8'>
                                     <span className='bg-(--accent-light) text-(--accent-dark) border border-(--accent-dark) px-3 py-1 text-sm font-medium rounded'>
                                         Recommended
