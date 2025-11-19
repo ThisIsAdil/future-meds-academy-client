@@ -3,6 +3,7 @@ import { useParams, Link } from "react-router-dom"
 import { Loader } from "../components"
 import { universityService } from "../services/university"
 import { ExternalLink } from "lucide-react"
+import ReactMarkdown from "react-markdown";
 
 const University = () => {
     const { id } = useParams()
@@ -80,10 +81,68 @@ const University = () => {
             )}
 
             {university.about && (
-                <section className="mb-6">
-                    <h2 className="text-xl font-semibold mb-2">About</h2>
-                    <p className="text-justify whitespace-pre-line text-gray-700">{university.about}</p>
-                </section>
+                <div className="px-4 pb-8">
+                    <ReactMarkdown
+                        components={{
+                            h1: ({ node, ...props }) => (
+                                <h1 {...props} className="text-3xl font-bold mt-6 mb-4 text-gray-900" />
+                            ),
+                            h2: ({ node, ...props }) => (
+                                <h2 {...props} className="text-2xl font-semibold mt-5 mb-3 text-gray-900" />
+                            ),
+                            h3: ({ node, ...props }) => (
+                                <h3 {...props} className="text-xl font-semibold mt-4 mb-2 text-gray-900" />
+                            ),
+                            p: ({ node, ...props }) => (
+                                <p {...props} className="text-base leading-relaxed text-gray-700 mb-4" />
+                            ),
+                            ul: ({ node, ...props }) => (
+                                <ul {...props} className="list-disc list-inside text-gray-700 mb-4 ml-4" />
+                            ),
+                            ol: ({ node, ...props }) => (
+                                <ol {...props} className="list-decimal list-inside text-gray-700 mb-4 ml-4" />
+                            ),
+                            li: ({ node, ...props }) => (
+                                <li {...props} className="mb-1" />
+                            ),
+                            a: ({ node, ...props }) => (
+                                <a
+                                    {...props}
+                                    className="text-blue-600 hover:text-blue-800 underline transition-colors"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                />
+                            ),
+                            blockquote: ({ node, ...props }) => (
+                                <blockquote
+                                    {...props}
+                                    className="border-l-4 border-gray-300 pl-4 italic text-gray-600 my-4"
+                                />
+                            ),
+                            code: ({ node, inline, ...props }) =>
+                                inline ? (
+                                    <code
+                                        {...props}
+                                        className="bg-gray-100 text-gray-800 px-1 py-0.5 rounded text-sm font-mono"
+                                    />
+                                ) : (
+                                    <pre
+                                        {...props}
+                                        className="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto text-sm font-mono my-4"
+                                    />
+                                ),
+                            img: ({ node, ...props }) => (
+                                <img {...props} className="rounded-lg my-4 max-w-full mx-auto" alt="" />
+                            ),
+                            hr: ({ node, ...props }) => (
+                                <hr {...props} className="my-6 border-gray-300" />
+                            ),
+                        }}
+                    >
+                        {university.about}
+                    </ReactMarkdown>
+
+                </div>
             )}
 
             {Array.isArray(university.yearlyData) && university.yearlyData.length > 0 && (
