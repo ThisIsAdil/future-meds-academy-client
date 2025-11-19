@@ -11,6 +11,7 @@ const ITEMS_PER_PAGE = 10
 const EMPTY_FORM = {
     id: '',
     name: '',
+    about: '',
     location: '',
     tuitionFees: '',
     programLength: '',
@@ -71,6 +72,7 @@ const IMATUniversities = () => {
         setForm({
             id: u.id || u._id || '',
             name: u.name || '',
+            about: u.about || '',
             location: u.location || '',
             tuitionFees: u.tuitionFees || '',
             programLength: u.programLength || '',
@@ -143,6 +145,7 @@ const IMATUniversities = () => {
             const hasFile = form.logo instanceof File || form.campusImage instanceof File
             const payloadObj = {
                 name: form.name,
+                about: form.about,
                 location: form.location,
                 tuitionFees: form.tuitionFees,
                 programLength: form.programLength,
@@ -289,6 +292,11 @@ const IMATUniversities = () => {
                             <ExternalLink className="absolute left-3 top-1/2 transform -translate-y-1/2" style={{ color: 'var(--accent-dark)' }} size={20} />
                             <input type="url" name="blogUrl" value={form.blogUrl} onChange={onInput} className="w-full pl-12 pr-4 py-3 rounded-lg border-0 focus:outline-none focus:ring-2" style={{ backgroundColor: 'var(--accent-light)', color: 'var(--secondary)' }} placeholder="https://..." />
                         </div>
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium mb-2" style={{ color: 'var(--accent-dark)' }}>About</label>
+                        <textarea name="about" value={form.about} onChange={onInput} rows={4} className="w-full px-4 py-3 rounded-lg border-0 focus:outline-none focus:ring-2" style={{ backgroundColor: 'var(--accent-light)', color: 'var(--secondary)' }} placeholder="Short description about the university" />
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

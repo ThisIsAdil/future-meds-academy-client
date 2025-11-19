@@ -99,9 +99,9 @@ const Universities = ({ title, universities }) => {
                                 }
                             </div>
                             {university.blogUrl && (
-                                <Link to={university.blogUrl} className='animated-button'>
+                                <Link to={`/university/${university._id}`} className='animated-button'>
                                     <span className='label'>
-                                        View Details
+                                        View More
                                     </span>
                                 </Link>
                             )}
