@@ -48,15 +48,9 @@ const EuCutOff = () => {
                         cutOffRounds: Array.isArray(yd.eu?.cutOffRounds) ? yd.eu.cutOffRounds : (yd.eu?.cutOffRounds === undefined ? [] : []),
                         finalCutOff: yd.eu?.finalCutOff ?? null
                     };
-                    const nonEu = {
-                        seats: yd.nonEu?.seats ?? null,
-                        finalCutOff: yd.nonEu?.finalCutOff ?? null,
-                        rankingPdfUrl: yd.nonEu?.rankingPdfUrl ?? null
-                    };
                     return {
                         university: u,
                         eu,
-                        nonEu
                     };
                 })
                 .filter(Boolean)
@@ -111,16 +105,12 @@ const EuCutOff = () => {
                                     <tr className="bg-white">
                                         <th className="border p-2 text-left">University</th>
                                         <th className="border p-2 text-center">EU Seats</th>
-                                        <th className="border p-2 text-center">EU Final Cutoff</th>
                                         <th className="border p-2 text-center">EU Seats Left</th>
 
                                         {Array.from({ length: group.maxRounds }).map((_, i) => (
                                             <th key={i} className="border p-2 text-center">Round {i + 1}</th>
                                         ))}
-
-                                        <th className="border p-2 text-center">Non-EU Seats</th>
-                                        <th className="border p-2 text-center">Non-EU Final Cutoff</th>
-                                        <th className="border p-2 text-center">Ranking PDF</th>
+                                        <th className="border p-2 text-center">EU Final Cutoff</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -133,24 +123,13 @@ const EuCutOff = () => {
                                             <tr key={rowKey} className="odd:bg-white even:bg-[var(--primary)]">
                                                 <td className="border p-2">{u.name}</td>
                                                 <td className="border p-2 text-center">{formatValue(eu.seats)}</td>
-                                                <td className="border p-2 text-center">{formatValue(eu.finalCutOff)}</td>
                                                 <td className="border p-2 text-center">{formatValue(eu.seatsLeft)}</td>
-
                                                 {Array.from({ length: group.maxRounds }).map((_, i) => (
                                                     <td key={i} className="border p-2 text-center">
                                                         {eu.cutOffRounds && eu.cutOffRounds[i] !== undefined ? formatValue(eu.cutOffRounds[i]) : '-'}
                                                     </td>
                                                 ))}
-
-                                                <td className="border p-2 text-center">{formatValue(nonEu.seats)}</td>
-                                                <td className="border p-2 text-center">{formatValue(nonEu.finalCutOff)}</td>
-                                                <td className="border p-2 text-center">
-                                                    {nonEu.rankingPdfUrl ? (
-                                                        <a href={nonEu.rankingPdfUrl} target="_blank" rel="noreferrer" className="text-blue-600 underline">
-                                                            View PDF
-                                                        </a>
-                                                    ) : '-'}
-                                                </td>
+                                                <td className="border p-2 text-center">{formatValue(eu.finalCutOff)}</td>
                                             </tr>
                                         )
                                     })}

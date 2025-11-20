@@ -64,7 +64,7 @@ const University = () => {
                         rel="noopener noreferrer"
                         className="animated-link ml-auto"
                     >
-                        <span className="label text-sm text-gray-700">University Blog</span>
+                        <span className="label text-sm text-gray-700">View Resource</span>
                         <ExternalLink className="inline-block ml-1" size={14} />
                     </a>
                 )}

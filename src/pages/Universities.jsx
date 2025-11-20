@@ -98,13 +98,11 @@ const Universities = ({ title, universities }) => {
                                     )
                                 }
                             </div>
-                            {university.blogUrl && (
-                                <Link to={`/university/${university._id}`} className='animated-button'>
-                                    <span className='label'>
-                                        View More
-                                    </span>
-                                </Link>
-                            )}
+                            <Link to={`/university/${university._id}`} className='animated-button'>
+                                <span className='label'>
+                                    View More
+                                </span>
+                            </Link>
                         </div>
                     </div>
                 ))}
